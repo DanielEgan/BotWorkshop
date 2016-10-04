@@ -1,0 +1,335 @@
+{
+  "luis_schema_version": "1.3.0",
+  "name": "Bar Tender",
+  "desc": "Bar Tender",
+  "culture": "en-us",
+  "intents": [
+    {
+      "name": "PlaceOrder"
+    },
+    {
+      "name": "None"
+    },
+    {
+      "name": "CheckTab"
+    },
+    {
+      "name": "CloseTab"
+    }
+  ],
+  "entities": [
+    {
+      "name": "Drink"
+    }
+  ],
+  "composites": [],
+  "bing_entities": [],
+  "actions": [],
+  "model_features": [
+    {
+      "name": "Drinks",
+      "mode": true,
+      "words": "beer,scotch,cosmopolitan,vodka,scotch on the rocks,whisky sour,manhattan,old fashioned,cocktail",
+      "activated": true
+    }
+  ],
+  "regex_features": [],
+  "utterances": [
+    {
+      "text": "what is my tab?",
+      "intent": "CheckTab",
+      "entities": []
+    },
+    {
+      "text": "i'd take a beer please",
+      "intent": "PlaceOrder",
+      "entities": [
+        {
+          "entity": "Drink",
+          "startPos": 5,
+          "endPos": 5
+        }
+      ]
+    },
+    {
+      "text": "close me out please",
+      "intent": "CloseTab",
+      "entities": []
+    },
+    {
+      "text": "get me a beer please",
+      "intent": "PlaceOrder",
+      "entities": [
+        {
+          "entity": "Drink",
+          "startPos": 3,
+          "endPos": 3
+        }
+      ]
+    },
+    {
+      "text": "i'd take another",
+      "intent": "PlaceOrder",
+      "entities": []
+    },
+    {
+      "text": "beer please",
+      "intent": "PlaceOrder",
+      "entities": [
+        {
+          "entity": "Drink",
+          "startPos": 0,
+          "endPos": 0
+        }
+      ]
+    },
+    {
+      "text": "i'd take a scotch",
+      "intent": "PlaceOrder",
+      "entities": [
+        {
+          "entity": "Drink",
+          "startPos": 5,
+          "endPos": 5
+        }
+      ]
+    },
+    {
+      "text": "one cosmopolitan please",
+      "intent": "PlaceOrder",
+      "entities": [
+        {
+          "entity": "Drink",
+          "startPos": 1,
+          "endPos": 1
+        }
+      ]
+    },
+    {
+      "text": "bill please",
+      "intent": "CloseTab",
+      "entities": []
+    },
+    {
+      "text": "i'd take the bill",
+      "intent": "CloseTab",
+      "entities": []
+    },
+    {
+      "text": "i'd like a beer",
+      "intent": "PlaceOrder",
+      "entities": [
+        {
+          "entity": "Drink",
+          "startPos": 5,
+          "endPos": 5
+        }
+      ]
+    },
+    {
+      "text": "scotch please",
+      "intent": "PlaceOrder",
+      "entities": [
+        {
+          "entity": "Drink",
+          "startPos": 0,
+          "endPos": 0
+        }
+      ]
+    },
+    {
+      "text": "i'd take a scotch on the rocks",
+      "intent": "PlaceOrder",
+      "entities": [
+        {
+          "entity": "Drink",
+          "startPos": 5,
+          "endPos": 5
+        },
+        {
+          "entity": "Drink",
+          "startPos": 7,
+          "endPos": 7
+        },
+        {
+          "entity": "Drink",
+          "startPos": 8,
+          "endPos": 8
+        }
+      ]
+    },
+    {
+      "text": "i'd take a beer, scotch and a cosmopolitan please",
+      "intent": "PlaceOrder",
+      "entities": [
+        {
+          "entity": "Drink",
+          "startPos": 5,
+          "endPos": 5
+        },
+        {
+          "entity": "Drink",
+          "startPos": 7,
+          "endPos": 7
+        },
+        {
+          "entity": "Drink",
+          "startPos": 10,
+          "endPos": 10
+        }
+      ]
+    },
+    {
+      "text": "how much do i owe?",
+      "intent": "CheckTab",
+      "entities": []
+    },
+    {
+      "text": "i'd take a scotch on the rocks please",
+      "intent": "PlaceOrder",
+      "entities": [
+        {
+          "entity": "Drink",
+          "startPos": 5,
+          "endPos": 8
+        }
+      ]
+    },
+    {
+      "text": "what's the damage?",
+      "intent": "CheckTab",
+      "entities": []
+    },
+    {
+      "text": "what's my tab?",
+      "intent": "CheckTab",
+      "entities": []
+    },
+    {
+      "text": "what do i owe you?",
+      "intent": "CheckTab",
+      "entities": []
+    },
+    {
+      "text": "can you close me out please?",
+      "intent": "CloseTab",
+      "entities": []
+    },
+    {
+      "text": "i'll close up with you",
+      "intent": "CloseTab",
+      "entities": []
+    },
+    {
+      "text": "i'll close up",
+      "intent": "CloseTab",
+      "entities": []
+    },
+    {
+      "text": "i'd like to close up please",
+      "intent": "CloseTab",
+      "entities": []
+    },
+    {
+      "text": "fly an airplane",
+      "intent": "None",
+      "entities": []
+    },
+    {
+      "text": "and a scotch",
+      "intent": "PlaceOrder",
+      "entities": [
+        {
+          "entity": "Drink",
+          "startPos": 2,
+          "endPos": 2
+        }
+      ]
+    },
+    {
+      "text": "i'd like a refrigerator",
+      "intent": "None",
+      "entities": []
+    },
+    {
+      "text": "i'd like a refridgerator",
+      "intent": "PlaceOrder",
+      "entities": []
+    },
+    {
+      "text": "i'd like a scotch please",
+      "intent": "PlaceOrder",
+      "entities": [
+        {
+          "entity": "Drink",
+          "startPos": 5,
+          "endPos": 5
+        }
+      ]
+    },
+    {
+      "text": "i'd take a cosmopolitan",
+      "intent": "PlaceOrder",
+      "entities": [
+        {
+          "entity": "Drink",
+          "startPos": 5,
+          "endPos": 5
+        }
+      ]
+    },
+    {
+      "text": "i'd like a banana please",
+      "intent": "PlaceOrder",
+      "entities": []
+    },
+    {
+      "text": "how about a cosmopolitan",
+      "intent": "PlaceOrder",
+      "entities": [
+        {
+          "entity": "Drink",
+          "startPos": 3,
+          "endPos": 3
+        }
+      ]
+    },
+    {
+      "text": "i'd take a beer",
+      "intent": "PlaceOrder",
+      "entities": [
+        {
+          "entity": "Drink",
+          "startPos": 5,
+          "endPos": 5
+        }
+      ]
+    },
+    {
+      "text": "what do i owe?",
+      "intent": "CheckTab",
+      "entities": []
+    },
+    {
+      "text": "i'd like another",
+      "intent": "PlaceOrder",
+      "entities": []
+    },
+    {
+      "text": "i'd like a beer please",
+      "intent": "PlaceOrder",
+      "entities": [
+        {
+          "entity": "Drink",
+          "startPos": 5,
+          "endPos": 5
+        }
+      ]
+    },
+    {
+      "text": "i'd like a banaha",
+      "intent": "PlaceOrder",
+      "entities": []
+    }
+  ]
+}
