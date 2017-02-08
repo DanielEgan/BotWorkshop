@@ -1,0 +1,93 @@
+{
+  "luis_schema_version": "1.3.1",
+  "versionId": "0.1",
+  "name": "DinnerBot",
+  "desc": "",
+  "culture": "en-us",
+  "intents": [
+    {
+      "name": "Help"
+    },
+    {
+      "name": "None"
+    },
+    {
+      "name": "ReserveATable"
+    },
+    {
+      "name": "SayHello"
+    }
+  ],
+  "entities": [
+    {
+      "name": "SpecialOccasion"
+    }
+  ],
+  "composites": [],
+  "closedLists": [],
+  "bing_entities": [
+    "datetime",
+    "number"
+  ],
+  "actions": [],
+  "model_features": [],
+  "regex_features": [],
+  "utterances": [
+    {
+      "text": "hi",
+      "intent": "SayHello",
+      "entities": []
+    },
+    {
+      "text": "hello",
+      "intent": "SayHello",
+      "entities": []
+    },
+    {
+      "text": "whats up",
+      "intent": "SayHello",
+      "entities": []
+    },
+    {
+      "text": "i need a table for 5 on 10/15/17 at 9pm for a birthday party",
+      "intent": "ReserveATable",
+      "entities": [
+        {
+          "entity": "SpecialOccasion",
+          "startPos": 16,
+          "endPos": 16
+        }
+      ]
+    },
+    {
+      "text": "i need a table for 2",
+      "intent": "ReserveATable",
+      "entities": []
+    },
+    {
+      "text": "i would like to book a reservation for 5",
+      "intent": "ReserveATable",
+      "entities": []
+    },
+    {
+      "text": "book table",
+      "intent": "ReserveATable",
+      "entities": []
+    },
+    {
+      "text": "help",
+      "intent": "Help",
+      "entities": []
+    },
+    {
+      "text": "what can you do?",
+      "intent": "Help",
+      "entities": []
+    },
+    {
+      "text": "help me",
+      "intent": "Help",
+      "entities": []
+    }
+  ]
+}

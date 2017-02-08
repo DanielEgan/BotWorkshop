@@ -1,0 +1,259 @@
+----- SNIP1-----------------------------------
+using Microsoft.Bot.Builder.Dialogs;
+using Microsoft.Bot.Connector;
+using Microsoft.Bot.Builder.FormFlow;
+
+
+----- SNIP2-----------------------------------
+//Greet the user
+await context.PostAsync("Hey there, how are you?");
+//call the respond method below
+await Respond(context);
+//call context.Wait and set the callback method
+context.Wait(MessageReceivedAsync);
+
+
+----- SNIP3-----------------------------------
+private static async Task Respond(IDialogContext context)
+ {
+     //Varible to hold user name
+     var userName = String.Empty;
+     //check to see if we already have username stored
+     context.UserData.TryGetValue<string>("Name", out userName);
+     //If not, we will ask for it. 
+     if (string.IsNullOrEmpty(userName))
+     {
+         //We ask here but dont capture it here, we do that in the MessageRecieved Async
+         await context.PostAsync("What is your name?");
+         //We set a value telling us that we need to get the name out of userdata
+         context.UserData.SetValue<bool>("GetName", true);
+     }
+     else
+     {
+         //If name was already stored we will say hi to the user.
+         await context.PostAsync(String.Format("Hi {0}.  How can I help you today?", userName));
+     }
+ }
+
+
+----- SNIP4-----------------------------------
+
+public async Task MessageReceivedAsync(IDialogContext context, IAwaitable<IMessageActivity> argument)
+{
+    //variable to hold message coming in
+    var message = await argument;
+    //variable for userName
+    var userName = String.Empty;
+    //variable to hold whether or not we need to get name
+    var getName = false;
+    //see if name exists
+    context.UserData.TryGetValue<string>("Name", out userName);
+    //if GetName exists we assign it to the getName variable and replace false
+    context.UserData.TryGetValue<bool>("GetName", out getName);
+    //If we need to get name, we go in here.
+    if (getName)
+    {
+        //we get the username we stored above. and set getname to false
+        userName = message.Text;
+        context.UserData.SetValue<string>("Name", userName);
+        context.UserData.SetValue<bool>("GetName", false);
+    }
+
+    //we call respond again, this time it will print out the name and greeting
+    await Respond(context);
+    //call context.done to exit this dialog and go back to the root dialog
+    context.Done(message);
+}
+
+
+----- SNIP5-----------------------------------
+private const string ReservartionOption = "Reserve Table";
+private const string HelloOption = "Say Hello";
+
+
+----- SNIP6-----------------------------------
+PromptDialog.Choice(
+     context, 
+     this.OnOptionSelected, 
+     new List<string>() { ReservartionOption, HelloOption }, 
+     String.Format("Hi, are you looking for to resere a table or Just say hello?"), "Not a valid option", 3);
+
+----- SNIP7-----------------------------------
+private async Task OnOptionSelected(IDialogContext context, IAwaitable<string> result)
+{
+    try
+    {
+        //capture which option then selected
+        string optionSelected = await result;
+        switch (optionSelected)
+        {
+            case ReservartionOption:
+                break;
+
+            case HelloOption:
+                context.Call(new HelloDialog(), this.ResumeAfterOptionDialog);
+                break;
+        }
+    }
+    catch (TooManyAttemptsException ex)
+    {
+        //If too many attempts we send error to user and start all over. 
+        await context.PostAsync($"Ooops! Too many attemps :( You can start again!");
+
+        //This sets us in a waiting state, after running the prompt again. 
+        context.Wait(this.MessageReceivedAsync);
+    }
+}
+
+
+----- SNIP8-----------------------------------
+public enum SpecialOccasionOptions
+{
+    Birthday,
+    Anniversary,
+    Engagement,
+    none
+}
+
+
+----- SNIP9-----------------------------------
+[Prompt(new string[] { "What is your name?" })]
+public string Name { get; set; }
+
+[Prompt(new string[] { "What is your email?" })]
+public string Email { get; set; }
+
+[Pattern(@"^(\+\d{1,2}\s)?\(?\d{3}\)?[\s.-]?\d{3}[\s.-]?\d{4}$")]
+
+
+----- SNIP10-----------------------------------
+[Prompt("How many people will be joining us?")]
+[Numeric(1, 20)]
+public int? NumberOfDinners;
+public SpecialOccasionOptions? SpecialOccasion;
+
+[Numeric(1, 5)]
+[Optional]
+[Describe("for how you enjoyed your experience with Dinner Bot today (optional)")]
+public double? Rating;
+
+----- SNIP11-----------------------------------
+public static IForm<ReservationDialog> BuildForm()
+{
+    return new FormBuilder<ReservationDialog>()
+        .Field(nameof(Name))
+        .Field(nameof(Email), validate: ValidateContactInformation)
+        .Field(nameof(PhoneNumber))
+        .Field(nameof(ReservationDate))
+        .Field(new FieldReflector<ReservationDialog>(nameof(ReservationDialog.ReservationTime))
+            .SetPrompt(PerLinePromptAttribute("What time would you like to arrive?"))
+            ).AddRemainingFields()
+        .Build();
+}
+
+
+----- SNIP12-----------------------------------
+private static Task<ValidateResult> ValidateContactInformation(ReservationDialog state, object response)
+{
+    var result = new ValidateResult();
+    string contactInfo = string.Empty;
+    if (GetEmailAddress((string)response, out contactInfo))
+    {
+        result.IsValid = true;
+        result.Value = contactInfo;
+    }
+    else
+    {
+        result.IsValid = false;
+        result.Feedback = "You did not enter valid email address.";
+    }
+    return Task.FromResult(result);
+}
+
+private static bool GetEmailAddress(string response, out string contactInfo)
+{
+    contactInfo = string.Empty;
+    var match = Regex.Match(response, @"[a-z0-9!#$%&'*+/=?^_`{|}~-]+(?:\.[a-z0-9!#$%&'*+/=?^_`{|}~-]+)*@(?:[a-z0-9](?:[a-z0-9-]*[a-z0-9])?\.)+[a-z0-9](?:[a-z0-9-]*[a-z0-9])?");
+    if (match.Success)
+    {
+        contactInfo = match.Value;
+        return true;
+    }
+    return false;
+}
+
+private static PromptAttribute PerLinePromptAttribute(string pattern)
+{
+    return new PromptAttribute(pattern)
+    {
+        ChoiceStyle = ChoiceStyleOptions.PerLine
+    };
+}
+
+
+----- SNIP13-----------------------------------
+await context.PostAsync("Welcome to Dinner Bot, lets book a table for you. You will need to provide a few details.");
+var reservationForm = new FormDialog<ReservationDialog>(new ReservationDialog(), 
+                                                        ReservationDialog.BuildForm, 
+                                                        FormOptions.PromptFieldsWithValues);
+context.Call(reservationForm, FeedbackFormComplete);
+
+
+
+----- SNIP14-----------------------------------
+private async Task ReservationFormComplete(IDialogContext context, IAwaitable<ReservationDialog> result)
+{
+    try
+    {
+        var reservation = await result;
+        await context.PostAsync("Thanks for the using Dinner Bot.");
+        //use a card for showing their data
+        var resultMessage = context.MakeMessage();
+        //resultMessage.AttachmentLayout = AttachmentLayoutTypes.Carousel;
+        resultMessage.Attachments = new List<Attachment>();
+        string ThankYouMessage;
+
+        if (reservation.SpecialOccasion == ReservationDialog.SpecialOccasionOptions.none)
+        {
+            ThankYouMessage = reservation.Name + ", thank you for joining us for dinner, we look forward to having you and your guests.";
+        }
+        else
+        {
+            ThankYouMessage = reservation.Name + ", thank you for joining us for dinner, we look forward to having you and your guests for the " + reservation.SpecialOccasion;
+        }
+        ThumbnailCard thumbnailCard = new ThumbnailCard()
+        {
+
+            Title = String.Format("Dinner Reservations on {0}", reservation.ReservationDate.ToString("MM/dd/yyyy")),
+            Subtitle = String.Format("at {1} for {0} people", reservation.NumberOfDinners, reservation.ReservationTime.ToString("hh:mm")),
+            Text = ThankYouMessage,
+            Images = new List<CardImage>()
+                {
+                    new CardImage() { Url = "https://upload.wikimedia.org/wikipedia/en/e/ee/Unknown-person.gif" }
+                },
+        };
+
+        resultMessage.Attachments.Add(thumbnailCard.ToAttachment());
+        await context.PostAsync(resultMessage);
+        await context.PostAsync(String.Format(""));
+    }
+    catch (FormCanceledException)
+    {
+        await context.PostAsync("You canceled the transaction, ok. ");
+    }
+    catch (Exception ex)
+    {
+        var exDetail = ex;
+        await context.PostAsync("Something really bad happened. You can try again later meanwhile I'll check what went wrong.");
+    }
+    finally
+    {
+        context.Wait(MessageReceivedAsync);
+    }
+}                       
+
+	        
+
+	
+
+	
