@@ -110,7 +110,7 @@ This will open up our project in VS Code (again, you are free to choose your own
 >If you are using the PDF file, you can find the snippets in a separate file called SNIPS.txt 
 
 ``` js
-// SNIP1
+// SNIP 1
 
 //Talking with the user.. as simple as possible
 var builder = require('botbuilder');
@@ -172,8 +172,9 @@ In this exercise we will create a very simple bot so that you can get used to us
 1. First, we need to add the require for botbuilder, and to new up our connector and bot just like we have done before. 
 Add the following code to the top of the promptbot.js file. 
 
-```
------ SNIP2-----------------------------------
+``` js
+// SNIP 2
+
 var builder = require('botbuilder');
 
 var connector = new builder.ConsoleConnector().listen();
@@ -183,7 +184,7 @@ var bot = new builder.UniversalBot(connector);
 1. Next we need to add our dialog. It is one dialog, so let's look at the whole thing at once. (It makes it easier to copy/paste as well) Paste the following code directly below our bot variable (`var bot = new …`)  in `promptbot.js`.  
 
 ``` js
-// SNIP3
+// SNIP 3
 
 bot.dialog('/', [
    function (session) {
@@ -232,8 +233,8 @@ In this exercise we will create a LUIS Model. As discussed in the talk, we can c
 
 1. Add the following code to the luisai.js file. 
 
-```
-------SNIP4----------------------------------------
+``` js
+// SNIP 4
 
 var builder = require('botbuilder');
 
@@ -271,7 +272,8 @@ So replace the following code:
 With this code: 
 
 ``` js
-// SNIP5
+// SNIP 5
+
 // Add intent handlers
 dialog.matches('builtin.intent.alarm.set_alarm', [
     function (session, args, next) {
@@ -333,8 +335,9 @@ In the previous section of code, we are using a number of the techniques we have
 
 Paste the following code below the last section in `luisai.js`. 
 
-```
-------SNIP6------------------------------------------------
+``` js
+// SNIP 6
+
 dialog.matches('builtin.intent.alarm.delete_alarm', [
     function (session, args, next) {
         // Resolve entities passed from LUIS.
@@ -366,8 +369,9 @@ dialog.matches('builtin.intent.alarm.delete_alarm', [
 
 As you can see, it is very similar to the add alarm section with the addition of using the choice prompt. Now we need to add two more pieces to make it complete. We need to add back our default match section (one line of code) and a very simple implementation of an alarm. Paste the following code at the bottom of the luisai.js file. 
 
-```
-------SNIP7-----------------------------------------------
+``` js
+// SNIP 7
+
 dialog.onDefault(builder.DialogAction.send("I'm sorry I didn't understand. I can only create & delete alarms."));
 
 // Very simple alarm scheduler
@@ -491,8 +495,8 @@ The first thing we need to do is to run NGrok. You should have downloaded NGrok 
     With that gone, we need to set up the restify server. To do so, add the following lines under the restify require statement. 
 
     ``` js
-    ------SNIP8------------------------------------------------
-
+    // SNIP 8
+    
     // Setup Restify Server
     var server = restify.createServer();
     server.listen(process.env.port || process.env.PORT || 3978, function () {
@@ -506,7 +510,7 @@ The first thing we need to do is to run NGrok. You should have downloaded NGrok 
     Add the following code directly under the last code you pasted. 
 
     ``` js
-    ------SNIP 9------------------------------------------------
+    // SNIP 9
 
     // Create chat bot
     var connector = new builder.ChatConnector({
@@ -521,8 +525,9 @@ The first thing we need to do is to run NGrok. You should have downloaded NGrok 
 
     Add this code below the last code you pasted. 
 
-    ```
-    ------SNIP10-------------------------------------------------
+    ``` js
+    // SNIP 10
+
     var bot = new builder.UniversalBot(connector);
     server.post('/api/messages', connector.listen());
     ```
@@ -559,7 +564,7 @@ The first thing we need to do is to run NGrok. You should have downloaded NGrok 
 1.	Open up VS Code and add a file called index.html
 
     ``` html
-    <!-- SNIP11 -->
+    <!-- SNIP 11 -->
     <!doctype html>
     <html>
     <head>
@@ -591,7 +596,7 @@ The first thing we need to do is to run NGrok. You should have downloaded NGrok 
     Underneath the server.post('/api/messages', connector.listen()); line, add the following code. 
 
     ``` js
-    ------SNIP12-----------------------------------------------
+    // SNIP 12
 
     server.get('/', restify.serveStatic({
     directory: __dirname,
