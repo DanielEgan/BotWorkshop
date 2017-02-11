@@ -3,9 +3,6 @@ using Microsoft.Bot.Builder.FormFlow.Advanced;
 using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Web;
 
 namespace DinnerBot.Dialogs
 {
@@ -17,7 +14,7 @@ namespace DinnerBot.Dialogs
             Birthday,
             Anniversary,
             Engagement,
-            none
+            None
         }
 
         [Prompt(new string[] { "What is your name?" })]

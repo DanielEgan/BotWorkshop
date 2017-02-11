@@ -1,12 +1,8 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Web;
-
+using System.Threading.Tasks;
 using Microsoft.Bot.Builder.Dialogs;
 using Microsoft.Bot.Connector;
-using Microsoft.Bot.Builder.FormFlow;
-using System.Threading.Tasks;
 
 namespace DinnerBot.Dialogs
 {
@@ -14,13 +10,12 @@ namespace DinnerBot.Dialogs
     public class RootDialog : IDialog<object>
     {
         private const string ReservartionOption = "Reserve Table";
-        private const string HelloOption = "Say Hello";
+        private const string HelloOption        = "Say Hello"    ;
 
-        public async Task StartAsync(IDialogContext context)
+         public async Task StartAsync(IDialogContext context)
         {
-
-            await context.PostAsync("Welcome to Dinner Bot");
-            context.Wait(this.MessageReceivedAsync);
+            await context.PostAsync("Welcome to Dinner Bot"  );
+                  context.Wait     (this.MessageReceivedAsync);
         }
 
         private async Task MessageReceivedAsync(IDialogContext context, IAwaitable<IMessageActivity> result)
@@ -28,6 +23,7 @@ namespace DinnerBot.Dialogs
             PromptDialog.Choice(
                 context, 
                 this.OnOptionSelected, 
+                // Present two (2) options to user
                 new List<string>() { ReservartionOption, HelloOption }, 
                 String.Format("Hi, are you looking for to reserve a table or Just say hello?"), "Not a valid option", 3);
         }
@@ -41,8 +37,8 @@ namespace DinnerBot.Dialogs
                 switch (optionSelected)
                 {
                     case ReservartionOption:
+                        // Not implemented yet -- that's in the next lesson! 
                         break;
-
                     case HelloOption:
                         context.Call(new HelloDialog(), this.ResumeAfterOptionDialog);
                         break;
@@ -58,6 +54,9 @@ namespace DinnerBot.Dialogs
             }
         }
 
+        /// <summary>
+        ///  User did not select a reservation. Loop back to original statement and ask if they would like to make one.
+        /// </summary>
         private async Task ResumeAfterOptionDialog(IDialogContext context, IAwaitable<object> result)
         {
             try
