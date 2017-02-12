@@ -1,12 +1,9 @@
 ﻿using System;
+using System.Threading.Tasks;
 using System.Collections.Generic;
-using System.Linq;
-using System.Web;
-
 using Microsoft.Bot.Builder.Dialogs;
 using Microsoft.Bot.Connector;
 using Microsoft.Bot.Builder.FormFlow;
-using System.Threading.Tasks;
 
 namespace DinnerBot.Dialogs
 {
