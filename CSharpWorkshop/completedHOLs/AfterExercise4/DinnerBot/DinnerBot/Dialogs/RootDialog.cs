@@ -1,13 +1,9 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Web;
-
+using System.Threading.Tasks;
 using Microsoft.Bot.Builder.Dialogs;
 using Microsoft.Bot.Connector;
 using Microsoft.Bot.Builder.FormFlow;
-using System.Threading.Tasks;
-
 using Microsoft.Bot.Builder.Luis;
 using Microsoft.Bot.Builder.Luis.Models;
 
@@ -17,8 +13,8 @@ namespace DinnerBot.Dialogs
     [LuisModel("d15aae24-7dfd-4d41-8c92-573ca68419b1", "0b9b4371317b49248fc2adbff3b9dfd9")]
     public class RootDialog : LuisDialog<object>
     {
-        private const string ReservartionOption = "Reserve Table";
-        private const string HelloOption = "Say Hello";
+        private const string ReservationOption = "Reserve Table";
+        private const string HelloOption        = "Say Hello"    ;
 
         [LuisIntent("")]
         [LuisIntent("None")]
@@ -57,6 +53,56 @@ namespace DinnerBot.Dialogs
             context.Wait(MessageReceived);
         }
 
+
+        private async Task ResumeAfterUserInfoDialog(IDialogContext context, IAwaitable<IMessageActivity> result)
+        {
+            var message = await result;
+            context.Wait(this.MessageReceivedAsync);
+
+        }
+
+        private async Task MessageReceivedAsync(IDialogContext context, IAwaitable<IMessageActivity> result)
+        {
+
+
+                PromptDialog.Choice(
+                context,
+                this.OnOptionSelected,
+                // Present two (2) options to user
+                new List<string>() { ReservationOption, HelloOption },
+                String.Format("Hi are you looking for to reserve a table or Just say hello?"), "Not a valid option", 3);
+
+        }
+
+        private async Task OnOptionSelected(IDialogContext context, IAwaitable<string> result)
+        {
+            try
+            {
+                //capture which option then selected
+                string optionSelected = await result;
+                switch (optionSelected)
+                {
+                    case ReservationOption:
+                        context.Call(FormDialog.FromForm<ReservationDialog>(ReservationDialog.BuildForm,
+                        FormOptions.PromptInStart), this.ReservationFormComplete);
+
+                        break;
+
+                    case HelloOption:
+                        context.Call(new HelloDialog(), this.ResumeAfterOptionDialog);
+                        break;
+                }
+            }
+            catch (TooManyAttemptsException ex)
+            {
+                //If too many attempts we send error to user and start all over. 
+                await context.PostAsync($"Ooops! Too many attemps :( You can start again!");
+
+                //This sets us in a waiting state, after running the prompt again. 
+                context.Wait(this.MessageReceivedAsync);
+            }
+        }
+
         private async Task ReservationFormComplete(IDialogContext context, IAwaitable<ReservationDialog> result)
         {
             try
@@ -71,14 +117,11 @@ namespace DinnerBot.Dialogs
 
                 if (reservation.SpecialOccasion == ReservationDialog.SpecialOccasionOptions.none)
                 {
-                    ThankYouMessage = reservation.Name + 
-                        ", thank you for joining us for dinner, we look forward to having you and your guests.";
+                    ThankYouMessage = reservation.Name + ", thank you for joining us for dinner, we look forward to having you and your guests.";
                 }
                 else
                 {
-                    ThankYouMessage = reservation.Name + 
-                        ", thank you for joining us for dinner, we look forward to having you and your guests for the " + 
-                        reservation.SpecialOccasion;
+                    ThankYouMessage = reservation.Name + ", thank you for joining us for dinner, we look forward to having you and your guests for the " + reservation.SpecialOccasion;
                 }
                 ThumbnailCard thumbnailCard = new ThumbnailCard()
                 {
@@ -87,9 +130,9 @@ namespace DinnerBot.Dialogs
                     Subtitle = String.Format("at {1} for {0} people", reservation.NumberOfDinners, reservation.ReservationTime.ToString("hh:mm")),
                     Text = ThankYouMessage,
                     Images = new List<CardImage>()
-                        {
-                            new CardImage() { Url = "https://upload.wikimedia.org/wikipedia/en/e/ee/Unknown-person.gif" }
-                        },
+                {
+                    new CardImage() { Url = "https://upload.wikimedia.org/wikipedia/en/e/ee/Unknown-person.gif" }
+                },
                 };
 
                 resultMessage.Attachments.Add(thumbnailCard.ToAttachment());
@@ -111,46 +154,18 @@ namespace DinnerBot.Dialogs
             }
         }
 
-        private async Task MessageReceivedAsync(IDialogContext context, IAwaitable<IMessageActivity> result)
-        {
-            PromptDialog.Choice(
-                context, 
-                this.OnOptionSelected, 
-                new List<string>() { ReservartionOption, HelloOption }, 
-                String.Format("Hi, are you looking for to reserve a table or Just say hello?"), "Not a valid option", 3);
-        }
 
-        private async Task OnOptionSelected(IDialogContext context, IAwaitable<string> result)
-        {
-            try
-            {
-                //capture which option then selected
-                string optionSelected = await result;
-                switch (optionSelected)
-                {
-                    case ReservartionOption:
-                        break;
-
-                    case HelloOption:
-                        context.Call(new HelloDialog(), this.ResumeAfterOptionDialog);
-                        break;
-                }
-            }
-            catch (TooManyAttemptsException ex)
-            {
-                //If too many attempts we send error to user and start all over. 
-                await context.PostAsync($"Ooops! Too many attemps :( You can start again!");
-
-                //This sets us in a waiting state, after running the prompt again. 
-                context.Wait(this.MessageReceivedAsync);
-            }
-        }
-
+        /// <summary>
+        ///  User did not select a reservation. Loop back to original statement and ask if they would like to make one.
+        /// </summary>
         private async Task ResumeAfterOptionDialog(IDialogContext context, IAwaitable<object> result)
         {
             try
             {
+               
                 var message = await result;
+                
+
             }
             catch (Exception ex)
             {
@@ -161,5 +176,7 @@ namespace DinnerBot.Dialogs
                 context.Wait(this.MessageReceivedAsync);
             }
         }
+
+
     }
 }

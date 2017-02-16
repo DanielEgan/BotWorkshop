@@ -16,7 +16,7 @@ context.Wait(MessageReceivedAsync);
 ----- SNIP3-----------------------------------
 private static async Task Respond(IDialogContext context)
  {
-     //Varible to hold user name
+     //Variable to hold user name
      var userName = String.Empty;
      //check to see if we already have username stored
      context.UserData.TryGetValue<string>("Name", out userName);
@@ -67,7 +67,7 @@ public async Task MessageReceivedAsync(IDialogContext context, IAwaitable<IMessa
 
 
 ----- SNIP5-----------------------------------
-private const string ReservartionOption = "Reserve Table";
+private const string ReservationOption = "Reserve Table";
 private const string HelloOption = "Say Hello";
 
 
@@ -75,7 +75,7 @@ private const string HelloOption = "Say Hello";
 PromptDialog.Choice(
      context, 
      this.OnOptionSelected, 
-     new List<string>() { ReservartionOption, HelloOption }, 
+     new List<string>() { ReservationOption, HelloOption }, 
      String.Format("Hi, are you looking for to resere a table or Just say hello?"), "Not a valid option", 3);
 
 ----- SNIP7-----------------------------------
@@ -87,7 +87,7 @@ private async Task OnOptionSelected(IDialogContext context, IAwaitable<string> r
         string optionSelected = await result;
         switch (optionSelected)
         {
-            case ReservartionOption:
+            case ReservationOption:
                 break;
 
             case HelloOption:
@@ -98,7 +98,7 @@ private async Task OnOptionSelected(IDialogContext context, IAwaitable<string> r
     catch (TooManyAttemptsException ex)
     {
         //If too many attempts we send error to user and start all over. 
-        await context.PostAsync($"Ooops! Too many attemps :( You can start again!");
+        await context.PostAsync($"Ooops! Too many attempts :( You can start again!");
 
         //This sets us in a waiting state, after running the prompt again. 
         context.Wait(this.MessageReceivedAsync);
@@ -124,6 +124,7 @@ public string Name { get; set; }
 public string Email { get; set; }
 
 [Pattern(@"^(\+\d{1,2}\s)?\(?\d{3}\)?[\s.-]?\d{3}[\s.-]?\d{4}$")]
+public string PhoneNumber { get; set; }
 
 
 ----- SNIP10-----------------------------------
@@ -192,15 +193,95 @@ private static PromptAttribute PerLinePromptAttribute(string pattern)
 
 
 ----- SNIP13-----------------------------------
-await context.PostAsync("Welcome to Dinner Bot, lets book a table for you. You will need to provide a few details.");
-var reservationForm = new FormDialog<ReservationDialog>(new ReservationDialog(), 
-                                                        ReservationDialog.BuildForm, 
-                                                        FormOptions.PromptFieldsWithValues);
-context.Call(reservationForm, FeedbackFormComplete);
-
-
+//Greet the user
+await context.PostAsync("Before we begin, we would like to know who we are talking to?");
+//We ask here but dont capture it here, we do that in the MessageRecieved Async
+await context.PostAsync("What is your name?");
+//We set a value telling us that we need to get the name out of userdata
+context.UserData.SetValue<bool>("GetName", true);
+//call context.Wait and set the callback method
+context.Wait(MessageReceivedAsync);
 
 ----- SNIP14-----------------------------------
+public async Task MessageReceivedAsync(IDialogContext context, IAwaitable<IMessageActivity> argument)
+{
+    //variable to hold message coming in
+    var message = await argument;
+    //variable for userName
+    var userName = String.Empty;
+    //variable to hold whether or not we need to get name
+    var getName = false;
+    //see if name exists
+    context.UserData.TryGetValue<string>("Name", out userName);
+    //if GetName exists we assign it to the getName variable and replace false
+    context.UserData.TryGetValue<bool>("GetName", out getName);
+    //If we need to get name, we go in here.
+    if (getName)
+    {
+        //we get the username we stored above. and set getname to false
+        userName = message.Text;
+        context.UserData.SetValue<string>("Name", userName);
+        context.UserData.SetValue<bool>("GetName", false);
+    }
+    //call context.done to exit this dialog and go back to the root dialog
+    context.Done(message);
+}
+
+
+----- SNIP15-----------------------------------
+using Microsoft.Bot.Builder.Dialogs;
+using Microsoft.Bot.Connector;
+using System;
+using System.Threading.Tasks;
+
+
+namespace DinnerBot.Dialogs
+{
+    [Serializable]
+    public class HelloDialog : IDialog<object>
+    {
+        public async Task StartAsync(IDialogContext context)
+        {
+            //Greet the user
+            await context.PostAsync("Hey there, how are you?");
+  
+            //call context.Done
+            context.Done<object>(null);
+        }
+
+    }
+} 
+
+
+----- SNIP16-----------------------------------
+var userName = String.Empty;
+//check to see if we already have username stored
+
+//If not, we will ask for it. 
+if (!context.UserData.TryGetValue<string>("Name", out userName))
+{
+    context.Call(new UserInfoDialog(), this.ResumeAfterUserInfoDialog);
+}
+else
+{
+    PromptDialog.Choice(
+    context,
+    this.OnOptionSelected,
+    // Present two (2) options to user
+    new List<string>() { ReservationOption, HelloOption },
+    String.Format("Hi, {0} are you looking for to reserve a table or Just say hello?", userName), "Not a valid option", 3);
+} 
+
+----- SNIP17-----------------------------------
+private async Task ResumeAfterUserInfoDialog(IDialogContext context, IAwaitable<IMessageActivity> result)
+{
+    var message = await result;
+    context.Wait(this.MessageReceivedAsync);
+
+}
+
+
+----- SNIP19-----------------------------------
 private async Task ReservationFormComplete(IDialogContext context, IAwaitable<ReservationDialog> result)
 {
     try
@@ -250,7 +331,47 @@ private async Task ReservationFormComplete(IDialogContext context, IAwaitable<Re
     {
         context.Wait(MessageReceivedAsync);
     }
-}                       
+}  
+
+------SNIP20----------------------------------------------
+[LuisIntent("")]
+[LuisIntent("None")]
+public async Task None(IDialogContext context, LuisResult result)
+{
+    string message = $"Sorry, I did not understand '{result.Query}'";
+    await context.PostAsync(message);
+    context.Wait(MessageReceived);
+}
+
+[LuisIntent("ReserveATable")]
+public async Task ReserveATable(IDialogContext context, LuisResult result)
+{
+    try
+    {
+        await context.PostAsync("Great, lets book a table for you. You will need to provide a few details.");
+        var reservationForm = new FormDialog<ReservationDialog>(new ReservationDialog(), ReservationDialog.BuildForm, FormOptions.PromptInStart);
+        context.Call(reservationForm, ReservationFormComplete);
+    }
+    catch (Exception)
+    {
+        await context.PostAsync("Something really bad happened. You can try again later meanwhile I'll check what went wrong.");
+        context.Wait(MessageReceived);
+    }
+}
+
+[LuisIntent("SayHello")]
+public async Task SayHello(IDialogContext context, LuisResult result)
+{
+    context.Call(new HelloDialog(), this.ResumeAfterOptionDialog);
+}
+[LuisIntent("Help")]
+public async Task Help(IDialogContext context, LuisResult result)
+{
+    await context.PostAsync("Insert Help Dialog here");
+    context.Wait(MessageReceived);
+}  
+
+     
 
 	        
 

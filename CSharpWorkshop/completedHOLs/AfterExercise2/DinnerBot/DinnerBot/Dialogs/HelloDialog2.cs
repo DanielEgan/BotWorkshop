@@ -1,12 +1,15 @@
-﻿using System;
+﻿using Microsoft.Bot.Builder.Dialogs;
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Web;
 using System.Threading.Tasks;
 using Microsoft.Bot.Connector;
-using Microsoft.Bot.Builder.Dialogs;
 
 namespace DinnerBot.Dialogs
 {
     [Serializable]
-    public class HelloDialog : IDialog<object>
+    public class HelloDialog2 : IDialog<object>
     {
         public async Task StartAsync(IDialogContext context)
         {
@@ -20,7 +23,7 @@ namespace DinnerBot.Dialogs
 
         private static async Task Respond(IDialogContext context)
         {
-            //Variable to hold user name
+            //Varible to hold user name
             var userName = String.Empty;
             //check to see if we already have username stored
             context.UserData.TryGetValue<string>("Name", out userName);
@@ -42,22 +45,22 @@ namespace DinnerBot.Dialogs
         public async Task MessageReceivedAsync(IDialogContext context, IAwaitable<IMessageActivity> argument)
         {
             //variable to hold message coming in
-            var message  = await argument;
+            var message = await argument;
             //variable for userName
             var userName = String.Empty;
             //variable to hold whether or not we need to get name
             var getName = false;
             //see if name exists
-            context.UserData.TryGetValue<string>("Name"   , out userName);
+            context.UserData.TryGetValue<string>("Name", out userName);
             //if GetName exists we assign it to the getName variable and replace false
-            context.UserData.TryGetValue<bool>  ("GetName", out getName);
+            context.UserData.TryGetValue<bool>("GetName", out getName);
             //If we need to get name, we go in here.
             if (getName)
             {
                 //we get the username we stored above. and set getname to false
                 userName = message.Text;
-                context.UserData.SetValue<string>("Name"   , userName);
-                context.UserData.SetValue<bool>  ("GetName", false   );
+                context.UserData.SetValue<string>("Name", userName);
+                context.UserData.SetValue<bool>("GetName", false);
             }
 
             //we call respond again, this time it will print out the name and greeting

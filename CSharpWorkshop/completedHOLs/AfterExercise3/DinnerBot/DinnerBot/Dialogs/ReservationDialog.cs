@@ -1,17 +1,19 @@
-﻿using Microsoft.Bot.Builder.FormFlow;
-using Microsoft.Bot.Builder.FormFlow.Advanced;
-using System.Text.RegularExpressions;
-using System.Threading.Tasks;
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Web;
+using Microsoft.Bot.Builder.FormFlow;
+using Microsoft.Bot.Builder.FormFlow.Advanced;
+using System.Text.RegularExpressions;
+using System.Threading.Tasks;
+
 
 namespace DinnerBot.Dialogs
-{
+{   
     [Serializable]
     public class ReservationDialog
     {
+
         public enum SpecialOccasionOptions
         {
             Birthday,
@@ -29,8 +31,7 @@ namespace DinnerBot.Dialogs
         [Pattern(@"^(\+\d{1,2}\s)?\(?\d{3}\)?[\s.-]?\d{3}[\s.-]?\d{4}$")]
         public string PhoneNumber { get; set; }
 
-        [Prompt("What date would you like to dine with us? example: today, tomorrow, or any date like 04-06-2017 {||}",
-                        AllowDefault = BoolDefault.True)]
+        [Prompt("What date would you like to dine with us? example: today, tomorrow, or any date like 04-06-2017 {||}", AllowDefault = BoolDefault.True)]
         [Describe("Reservation date, example: today, tomorrow, or any date like 04-06-2017")]
         public DateTime ReservationDate { get; set; }
 
@@ -95,5 +96,7 @@ namespace DinnerBot.Dialogs
                 ChoiceStyle = ChoiceStyleOptions.PerLine
             };
         }
+
+
     }
 }

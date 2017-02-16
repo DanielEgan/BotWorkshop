@@ -3,13 +3,14 @@ using System.Collections.Generic;
 using System.Threading.Tasks;
 using Microsoft.Bot.Builder.Dialogs;
 using Microsoft.Bot.Connector;
+using Microsoft.Bot.Builder.FormFlow;
 
 namespace DinnerBot.Dialogs
 {
     [Serializable]
     public class RootDialog : IDialog<object>
     {
-        private const string ReservartionOption = "Reserve Table";
+        private const string ReservationOption = "Reserve Table";
         private const string HelloOption        = "Say Hello"    ;
 
          public async Task StartAsync(IDialogContext context)
@@ -20,12 +21,15 @@ namespace DinnerBot.Dialogs
 
         private async Task MessageReceivedAsync(IDialogContext context, IAwaitable<IMessageActivity> result)
         {
-            PromptDialog.Choice(
-                context, 
-                this.OnOptionSelected, 
+
+
+                PromptDialog.Choice(
+                context,
+                this.OnOptionSelected,
                 // Present two (2) options to user
-                new List<string>() { ReservartionOption, HelloOption }, 
-                String.Format("Hi, are you looking for to reserve a table or Just say hello?"), "Not a valid option", 3);
+                new List<string>() { ReservationOption, HelloOption },
+                String.Format("Hi are you looking for to reserve a table or Just say hello?"), "Not a valid option", 3);
+
         }
 
         private async Task OnOptionSelected(IDialogContext context, IAwaitable<string> result)
@@ -36,9 +40,10 @@ namespace DinnerBot.Dialogs
                 string optionSelected = await result;
                 switch (optionSelected)
                 {
-                    case ReservartionOption:
+                    case ReservationOption:
                         // Not implemented yet -- that's in the next lesson! 
                         break;
+
                     case HelloOption:
                         context.Call(new HelloDialog(), this.ResumeAfterOptionDialog);
                         break;
@@ -61,7 +66,10 @@ namespace DinnerBot.Dialogs
         {
             try
             {
+               
                 var message = await result;
+                
+
             }
             catch (Exception ex)
             {
@@ -72,5 +80,7 @@ namespace DinnerBot.Dialogs
                 context.Wait(this.MessageReceivedAsync);
             }
         }
+
+
     }
 }
