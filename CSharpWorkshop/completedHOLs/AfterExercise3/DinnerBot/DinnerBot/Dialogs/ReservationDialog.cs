@@ -6,10 +6,10 @@ using Microsoft.Bot.Builder.FormFlow;
 using Microsoft.Bot.Builder.FormFlow.Advanced;
 using System.Text.RegularExpressions;
 using System.Threading.Tasks;
-
+using Microsoft.Bot.Builder.Dialogs;
 
 namespace DinnerBot.Dialogs
-{   
+{
     [Serializable]
     public class ReservationDialog
     {
@@ -21,6 +21,8 @@ namespace DinnerBot.Dialogs
             Engagement,
             none
         }
+
+        public static IDialogContext context { get; set; }
 
         [Prompt(new string[] { "What is your name?" })]
         public string Name { get; set; }
@@ -49,8 +51,16 @@ namespace DinnerBot.Dialogs
 
         public static IForm<ReservationDialog> BuildForm()
         {
+            string userName = String.Empty;
+            context.UserData.TryGetValue<string>("Name", out userName);
             return new FormBuilder<ReservationDialog>()
-                .Field(nameof(Name))
+                .Field(new FieldReflector<ReservationDialog>(nameof(ReservationDialog.Name))
+                    .SetActive((state) =>
+                    {
+                        state.Name = userName;
+                        return String.IsNullOrEmpty(state.Name);
+
+                    }))
                 .Field(nameof(Email), validate: ValidateContactInformation)
                 .Field(nameof(PhoneNumber))
                 .Field(nameof(ReservationDate))

@@ -16,13 +16,33 @@ namespace DinnerBot.Dialogs
             
             //Greet the user
             await context.PostAsync("Before we begin, we would like to know who we are talking to?");
-            //We ask here but dont capture it here, we do that in the MessageRecieved Async
-            await context.PostAsync("What is your name?");
-            //We set a value telling us that we need to get the name out of userdata
-            context.UserData.SetValue<bool>("GetName", true);
+            //call the respond method below
+            await Respond(context);
             //call context.Wait and set the callback method
             context.Wait(MessageReceivedAsync);
 
+        }
+
+        private static async Task Respond(IDialogContext context)
+        {
+            //Variable to hold user name
+            var userName = String.Empty;
+            //check to see if we already have username stored
+            context.UserData.TryGetValue<string>("Name", out userName);
+            //If not, we will ask for it. 
+            if (string.IsNullOrEmpty(userName))
+            {
+                //We ask here but dont capture it here, we do that in the MessageRecieved Async
+                await context.PostAsync("What is your name?");
+                //We set a value telling us that we need to get the name out of userdata
+                context.UserData.SetValue<bool>("GetName", true);
+            }
+            else
+            {
+                //If name was already stored we will say hi to the user.
+                await context.PostAsync(String.Format("Hi {0}.  How can I help you today?", userName));
+
+            }
         }
 
         public async Task MessageReceivedAsync(IDialogContext context, IAwaitable<IMessageActivity> argument)
@@ -44,9 +64,12 @@ namespace DinnerBot.Dialogs
                 userName = message.Text;
                 context.UserData.SetValue<string>("Name", userName);
                 context.UserData.SetValue<bool>("GetName", false);
+
+                context.Wait(MessageReceivedAsync);
             }
-            //call context.done to exit this dialog and go back to the root dialog
+            await Respond(context);
             context.Done(message);
+            
         }
 
     }

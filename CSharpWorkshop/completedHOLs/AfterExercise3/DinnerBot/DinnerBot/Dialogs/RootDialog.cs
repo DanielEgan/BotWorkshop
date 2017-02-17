@@ -51,7 +51,7 @@ namespace DinnerBot.Dialogs
                 this.OnOptionSelected,
                 // Present two (2) options to user
                 new List<string>() { ReservationOption, HelloOption },
-                String.Format("Hi are you looking for to reserve a table or Just say hello?"), "Not a valid option", 3);
+                String.Format("Hi{0}, are you looking for to reserve a table or Just say hello?", context.UserData.Get<String>("Name") ), "Not a valid option", 3);
 
         }
 
@@ -64,6 +64,7 @@ namespace DinnerBot.Dialogs
                 switch (optionSelected)
                 {
                     case ReservationOption:
+                        ReservationDialog.context = context;
                         context.Call(FormDialog.FromForm<ReservationDialog>(ReservationDialog.BuildForm,
                         FormOptions.PromptInStart), this.ReservationFormComplete);
 
