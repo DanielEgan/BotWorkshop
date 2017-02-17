@@ -4,6 +4,7 @@ using System.Threading.Tasks;
 using Microsoft.Bot.Builder.Dialogs;
 using Microsoft.Bot.Connector;
 using Microsoft.Bot.Builder.FormFlow;
+using DinnerBot.Models;
 
 namespace DinnerBot.Dialogs
 {
@@ -64,8 +65,8 @@ namespace DinnerBot.Dialogs
                 switch (optionSelected)
                 {
                     case ReservationOption:
-                        ReservationDialog.context = context;
-                        context.Call(FormDialog.FromForm<ReservationDialog>(ReservationDialog.BuildForm,
+                        ReservationForm.context = context;
+                        context.Call(FormDialog.FromForm<Reservation>(ReservationForm.BuildForm,
                         FormOptions.PromptInStart), this.ReservationFormComplete);
 
                         break;
@@ -85,7 +86,7 @@ namespace DinnerBot.Dialogs
             }
         }
 
-        private async Task ReservationFormComplete(IDialogContext context, IAwaitable<ReservationDialog> result)
+        private async Task ReservationFormComplete(IDialogContext context, IAwaitable<Reservation> result)
         {
             try
             {
@@ -97,7 +98,7 @@ namespace DinnerBot.Dialogs
                 resultMessage.Attachments = new List<Attachment>();
                 string ThankYouMessage;
 
-                if (reservation.SpecialOccasion == ReservationDialog.SpecialOccasionOptions.none)
+                if (reservation.SpecialOccasion == Reservation.SpecialOccasionOptions.none)
                 {
                     ThankYouMessage = reservation.Name + ", thank you for joining us for dinner, we look forward to having you and your guests.";
                 }
