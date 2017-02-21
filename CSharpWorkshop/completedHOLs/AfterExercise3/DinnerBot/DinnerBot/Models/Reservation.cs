@@ -1,4 +1,5 @@
-﻿using Microsoft.Bot.Builder.FormFlow;
+﻿using Microsoft.Bot.Builder.Dialogs;
+using Microsoft.Bot.Builder.FormFlow;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -9,6 +10,11 @@ namespace DinnerBot.Models
     [Serializable]
     public class Reservation
     {
+        public Reservation(string name )
+        {
+            this.Name = name;
+        } 
+
         public enum SpecialOccasionOptions
         {
             Birthday,

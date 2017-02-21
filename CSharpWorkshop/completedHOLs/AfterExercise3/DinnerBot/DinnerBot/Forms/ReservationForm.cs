@@ -8,6 +8,7 @@ using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 using Microsoft.Bot.Builder.Dialogs;
 using DinnerBot.Models;
+using Microsoft.Bot.Connector;
 
 namespace DinnerBot.Dialogs
 {
@@ -15,17 +16,14 @@ namespace DinnerBot.Dialogs
     public class ReservationForm
     {
 
-        public static IDialogContext context { get; set; }
+        //public static IDialogContext context { get; set; }
 
         public static IForm<Reservation> BuildForm()
-        {
-            string userName = String.Empty;
-            context.UserData.TryGetValue<string>("Name", out userName);
+        {   
             return new FormBuilder<Reservation>()
                 .Field(new FieldReflector<Reservation>(nameof(Reservation.Name))
                     .SetActive((state) =>
                     {
-                        state.Name = userName;
                         return String.IsNullOrEmpty(state.Name);
 
                     }))

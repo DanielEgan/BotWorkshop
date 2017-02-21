@@ -48,27 +48,36 @@ namespace DinnerBot.Dialogs
         public async Task MessageReceivedAsync(IDialogContext context, IAwaitable<IMessageActivity> argument)
         {
             //variable to hold message coming in
-            var message = await argument;
-            //variable for userName
-            var userName = String.Empty;
-            //variable to hold whether or not we need to get name
-            var getName = false;
-            //see if name exists
-            context.UserData.TryGetValue<string>("Name", out userName);
-            //if GetName exists we assign it to the getName variable and replace false
-            context.UserData.TryGetValue<bool>("GetName", out getName);
-            //If we need to get name, we go in here.
-            if (getName)
+            try
             {
-                //we get the username we stored above. and set getname to false
-                userName = message.Text;
-                context.UserData.SetValue<string>("Name", userName);
-                context.UserData.SetValue<bool>("GetName", false);
+                var message = await argument;
+                //variable for userName
+                var userName = String.Empty;
+                //variable to hold whether or not we need to get name
+                var getName = false;
+                //see if name exists
+                context.UserData.TryGetValue<string>("Name", out userName);
+                //if GetName exists we assign it to the getName variable and replace false
+                context.UserData.TryGetValue<bool>("GetName", out getName);
+                //If we need to get name, we go in here.
+                if (getName)
+                {
+                    //we get the username we stored above. and set getname to false
+                    userName = message.Text;
+                    context.UserData.SetValue<string>("Name", userName);
+                    context.UserData.SetValue<bool>("GetName", true);
 
-                context.Wait(MessageReceivedAsync);
+                    context.Wait(MessageReceivedAsync);
+                }
+                //await Respond(context);
+                context.Done(message);
             }
-            await Respond(context);
-            context.Done(message);
+            catch (Exception ex)
+            {
+
+                string message = ex.Message;
+            }
+           
             
         }
 
