@@ -15,12 +15,9 @@ namespace DinnerBot.Dialogs
         private const string ReservationOption = "Reserve Table";
         private const string HelloOption = "Say Hello";
         
-
         public async Task StartAsync(IDialogContext context)
         {
-
             context.Wait(MessageReceivedAsync);
-
         }
         private void PromptUser(IDialogContext context)
         {
@@ -29,7 +26,7 @@ namespace DinnerBot.Dialogs
             this.OnOptionSelected,
             // Present two (2) options to user
             new List<string>() { ReservationOption, HelloOption },
-            String.Format("Hi{0}, are you looking for to reserve a table or Just say hello?", context.UserData.Get<String>("Name")), "Not a valid option", 3);
+            String.Format("Hi {0}, are you looking for to reserve a table or Just say hello?", context.UserData.Get<String>("Name")), "Not a valid option", 3);
         }
 
         private async Task ResumeAfterUserInfoDialog(IDialogContext context, IAwaitable<IMessageActivity> result)
@@ -46,15 +43,13 @@ namespace DinnerBot.Dialogs
 
         private async Task MessageReceivedAsync(IDialogContext context, IAwaitable<IMessageActivity> result)
         {
-
             //check to see if we already have username stored
             //If not, we will ask for it. 
             string userName = String.Empty;
             var message = await result;
             if (!context.UserData.TryGetValue<string>("Name", out userName))
             {
-                context.Call(new UserInfoDialog(), ResumeAfterUserInfoDialog);
-                
+                context.Call(new UserInfoDialog(), ResumeAfterUserInfoDialog);               
             }
             else
             {
