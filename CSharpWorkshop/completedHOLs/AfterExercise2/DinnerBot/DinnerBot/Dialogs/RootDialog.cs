@@ -22,7 +22,6 @@ namespace DinnerBot.Dialogs
         private async Task MessageReceivedAsync(IDialogContext context, IAwaitable<IMessageActivity> result)
         {
 
-
                 PromptDialog.Choice(
                 context,
                 this.OnOptionSelected,

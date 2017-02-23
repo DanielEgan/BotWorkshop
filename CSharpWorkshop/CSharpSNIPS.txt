@@ -12,7 +12,6 @@ await Respond(context);
 //call context.Wait and set the callback method
 context.Wait(MessageReceivedAsync);
 
-
 ----- SNIP3-----------------------------------
 private static async Task Respond(IDialogContext context)
  {
@@ -65,20 +64,19 @@ public async Task MessageReceivedAsync(IDialogContext context, IAwaitable<IMessa
     context.Done(message);
 }
 
-
 ----- SNIP5-----------------------------------
 private const string ReservationOption = "Reserve Table";
 private const string HelloOption = "Say Hello";
-
-
+        
 ----- SNIP6-----------------------------------
 PromptDialog.Choice(
      context, 
      this.OnOptionSelected, 
      new List<string>() { ReservationOption, HelloOption }, 
-     String.Format("Hi, are you looking for to resere a table or Just say hello?"), "Not a valid option", 3);
+     String.Format("Hi, are you looking for to reserve a table or Just say hello?"), "Not a valid option", 3);
 
------ SNIP7-----------------------------------
+
+  ----- SNIP7-----------------------------------
 private async Task OnOptionSelected(IDialogContext context, IAwaitable<string> result)
 {
     try
@@ -107,6 +105,23 @@ private async Task OnOptionSelected(IDialogContext context, IAwaitable<string> r
 
 
 ----- SNIP8-----------------------------------
+private async Task ResumeAfterOptionDialog(IDialogContext context, IAwaitable<object> result)
+{
+    try
+    {
+        var message = await result;
+    }
+    catch (Exception ex)
+    {
+        await context.PostAsync($"Failed with message: {ex.Message}");
+    }
+    finally
+    {
+        context.Wait(this.MessageReceivedAsync);
+    }
+}
+      
+----- SNIP9-----------------------------------
 public enum SpecialOccasionOptions
 {
     Birthday,
@@ -115,8 +130,7 @@ public enum SpecialOccasionOptions
     none
 }
 
-
------ SNIP9-----------------------------------
+----- SNIP10-----------------------------------
 [Prompt(new string[] { "What is your name?" })]
 public string Name { get; set; }
 
@@ -127,7 +141,16 @@ public string Email { get; set; }
 public string PhoneNumber { get; set; }
 
 
------ SNIP10-----------------------------------
+
+----- SNIP11-----------------------------------
+[Prompt("What date would you like to dine with us? example: today, tomorrow, or any date like 04-06-2017 {||}", AllowDefault = BoolDefault.True)]
+[Describe("Reservation date, example: today, tomorrow, or any date like 04-06-2017")]
+public DateTime ReservationDate { get; set; }
+
+public DateTime ReservationTime { get; set; }
+
+
+----- SNIP12-----------------------------------
 [Prompt("How many people will be joining us?")]
 [Numeric(1, 20)]
 public int? NumberOfDinners;
@@ -138,23 +161,31 @@ public SpecialOccasionOptions? SpecialOccasion;
 [Describe("for how you enjoyed your experience with Dinner Bot today (optional)")]
 public double? Rating;
 
------ SNIP11-----------------------------------
-public static IForm<ReservationDialog> BuildForm()
+
+----- SNIP13-----------------------------------
+public Reservation(string name )
+        {
+            this.Name = name;
+        }         
+
+
+----- SNIP14-----------------------------------
+public static IForm<Reservation> BuildForm()
 {
-    return new FormBuilder<ReservationDialog>()
-        .Field(nameof(Name))
-        .Field(nameof(Email), validate: ValidateContactInformation)
-        .Field(nameof(PhoneNumber))
-        .Field(nameof(ReservationDate))
-        .Field(new FieldReflector<ReservationDialog>(nameof(ReservationDialog.ReservationTime))
+    return new FormBuilder<Reservation>()
+        .Field(nameof(Reservation.Name))
+        .Field(nameof(Reservation.Email), validate: ValidateContactInformation)
+        .Field(nameof(Reservation.PhoneNumber))
+        .Field(nameof(Reservation.ReservationDate))
+        .Field(new FieldReflector<Reservation>(nameof(Reservation.ReservationTime))
             .SetPrompt(PerLinePromptAttribute("What time would you like to arrive?"))
             ).AddRemainingFields()
         .Build();
 }
 
 
------ SNIP12-----------------------------------
-private static Task<ValidateResult> ValidateContactInformation(ReservationDialog state, object response)
+----- SNIP15-----------------------------------
+private static Task<ValidateResult> ValidateContactInformation(Reservation state, object response)
 {
     var result = new ValidateResult();
     string contactInfo = string.Empty;
@@ -191,44 +222,77 @@ private static PromptAttribute PerLinePromptAttribute(string pattern)
     };
 }
 
-
------ SNIP13-----------------------------------
+----- SNIP16-----------------------------------
 //Greet the user
 await context.PostAsync("Before we begin, we would like to know who we are talking to?");
-//We ask here but dont capture it here, we do that in the MessageRecieved Async
-await context.PostAsync("What is your name?");
-//We set a value telling us that we need to get the name out of userdata
-context.UserData.SetValue<bool>("GetName", true);
+//call the respond method below
+await Respond(context);
 //call context.Wait and set the callback method
 context.Wait(MessageReceivedAsync);
 
------ SNIP14-----------------------------------
+----- SNIP17-----------------------------------
+private static async Task Respond(IDialogContext context)
+{
+    //Variable to hold user name
+    var userName = String.Empty;
+    //check to see if we already have username stored
+    context.UserData.TryGetValue<string>("Name", out userName);
+    //If not, we will ask for it. 
+    if (string.IsNullOrEmpty(userName))
+    {
+        //We ask here but dont capture it here, we do that in the MessageRecieved Async
+        await context.PostAsync("What is your name?");
+        //We set a value telling us that we need to get the name out of userdata
+        context.UserData.SetValue<bool>("GetName", true);
+    }
+    else
+    {
+        //If name was already stored we will say hi to the user.
+        await context.PostAsync(String.Format("Hi {0}.  How can I help you today?", userName));
+
+    }
+} 
+
+----- SNIP18-----------------------------------
 public async Task MessageReceivedAsync(IDialogContext context, IAwaitable<IMessageActivity> argument)
 {
     //variable to hold message coming in
-    var message = await argument;
-    //variable for userName
-    var userName = String.Empty;
-    //variable to hold whether or not we need to get name
-    var getName = false;
-    //see if name exists
-    context.UserData.TryGetValue<string>("Name", out userName);
-    //if GetName exists we assign it to the getName variable and replace false
-    context.UserData.TryGetValue<bool>("GetName", out getName);
-    //If we need to get name, we go in here.
-    if (getName)
+    try
     {
-        //we get the username we stored above. and set getname to false
-        userName = message.Text;
-        context.UserData.SetValue<string>("Name", userName);
-        context.UserData.SetValue<bool>("GetName", false);
+        var message = await argument;
+        //variable for userName
+        var userName = String.Empty;
+        //variable to hold whether or not we need to get name
+        var getName = false;
+        //see if name exists
+        context.UserData.TryGetValue<string>("Name", out userName);
+        //if GetName exists we assign it to the getName variable and replace false
+        context.UserData.TryGetValue<bool>("GetName", out getName);
+        //If we need to get name, we go in here.
+        if (getName)
+        {
+            //we get the username we stored above. and set getname to false
+            userName = message.Text;
+            context.UserData.SetValue<string>("Name", userName);
+            context.UserData.SetValue<bool>("GetName", true);
+
+            context.Wait(MessageReceivedAsync);
+        }
+        //await Respond(context);
+        context.Done(message);
     }
-    //call context.done to exit this dialog and go back to the root dialog
-    context.Done(message);
-}
+    catch (Exception ex)
+    {
+
+        string message = ex.Message;
+    }
+   
+    
+} 
 
 
------ SNIP15-----------------------------------
+
+----- SNIP19-----------------------------------
 using Microsoft.Bot.Builder.Dialogs;
 using Microsoft.Bot.Connector;
 using System;
@@ -253,36 +317,66 @@ namespace DinnerBot.Dialogs
 } 
 
 
------ SNIP16-----------------------------------
-var userName = String.Empty;
+----- SNIP20-----------------------------------
 //check to see if we already have username stored
-
 //If not, we will ask for it. 
+string userName = String.Empty;
+var message = await result;
 if (!context.UserData.TryGetValue<string>("Name", out userName))
 {
-    context.Call(new UserInfoDialog(), this.ResumeAfterUserInfoDialog);
+    context.Call(new UserInfoDialog(), ResumeAfterUserInfoDialog);
 }
 else
+{
+    PromptUser(context);
+}
+
+
+----- SNIP21-----------------------------------
+private void PromptUser(IDialogContext context)
 {
     PromptDialog.Choice(
     context,
     this.OnOptionSelected,
     // Present two (2) options to user
     new List<string>() { ReservationOption, HelloOption },
-    String.Format("Hi, {0} are you looking for to reserve a table or Just say hello?", userName), "Not a valid option", 3);
-} 
-
------ SNIP17-----------------------------------
-private async Task ResumeAfterUserInfoDialog(IDialogContext context, IAwaitable<IMessageActivity> result)
-{
-    var message = await result;
-    context.Wait(this.MessageReceivedAsync);
-
+    String.Format("Hi {0}, are you looking for to reserve a table or Just say hello?", context.UserData.Get<String>("Name")), "Not a valid option", 3);
 }
 
+----- SNIP22-----------------------------------
+private async Task ResumeAfterUserInfoDialog(IDialogContext context, IAwaitable<object> result)
+{
+    PromptUser(context);
+}
 
------ SNIP19-----------------------------------
-private async Task ReservationFormComplete(IDialogContext context, IAwaitable<ReservationDialog> result)
+----- SNIP23-----------------------------------
+case ReservationOption:
+    // Not implemented yet -- that's in the next lesson! 
+
+    var form = new FormDialog<Reservation>(
+    new Reservation(context.UserData.Get<String>("Name")),
+    ReservationForm.BuildForm,
+    FormOptions.PromptInStart,
+    null);
+
+    context.Call(form, this.ReservationFormComplete);
+    break;
+
+case HelloOption:
+    context.Call(new HelloDialog(), this.ResumeAfterUserHelloDialog);
+    break;
+
+
+
+----- SNIP24-----------------------------------
+private async Task ResumeAfterUserHelloDialog(IDialogContext context, IAwaitable<object> result)
+{
+    //we want it to go right to the prompting of reservation or hello
+    PromptUser(context);
+}
+
+----- SNIP25-----------------------------------
+private async Task ReservationFormComplete(IDialogContext context, IAwaitable<Reservation> result)
 {
     try
     {
@@ -294,7 +388,7 @@ private async Task ReservationFormComplete(IDialogContext context, IAwaitable<Re
         resultMessage.Attachments = new List<Attachment>();
         string ThankYouMessage;
 
-        if (reservation.SpecialOccasion == ReservationDialog.SpecialOccasionOptions.none)
+        if (reservation.SpecialOccasion == Reservation.SpecialOccasionOptions.none)
         {
             ThankYouMessage = reservation.Name + ", thank you for joining us for dinner, we look forward to having you and your guests.";
         }
@@ -309,9 +403,9 @@ private async Task ReservationFormComplete(IDialogContext context, IAwaitable<Re
             Subtitle = String.Format("at {1} for {0} people", reservation.NumberOfDinners, reservation.ReservationTime.ToString("hh:mm")),
             Text = ThankYouMessage,
             Images = new List<CardImage>()
-                {
-                    new CardImage() { Url = "https://upload.wikimedia.org/wikipedia/en/e/ee/Unknown-person.gif" }
-                },
+        {
+            new CardImage() { Url = "https://upload.wikimedia.org/wikipedia/en/e/ee/Unknown-person.gif" }
+        },
         };
 
         resultMessage.Attachments.Add(thumbnailCard.ToAttachment());
@@ -331,9 +425,11 @@ private async Task ReservationFormComplete(IDialogContext context, IAwaitable<Re
     {
         context.Wait(MessageReceivedAsync);
     }
-}  
+}
+    
 
-------SNIP20----------------------------------------------
+
+------SNIP26----------------------------------------------
 [LuisIntent("")]
 [LuisIntent("None")]
 public async Task None(IDialogContext context, LuisResult result)
@@ -371,10 +467,20 @@ public async Task Help(IDialogContext context, LuisResult result)
     context.Wait(MessageReceived);
 }  
 
-     
 
-	        
 
-	
 
-	
+
+
+
+
+
+
+
+
+
+
+
+
+
+
