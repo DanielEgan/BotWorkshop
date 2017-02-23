@@ -6,18 +6,14 @@ using Microsoft.Bot.Builder.FormFlow;
 using Microsoft.Bot.Builder.FormFlow.Advanced;
 using System.Text.RegularExpressions;
 using System.Threading.Tasks;
-using Microsoft.Bot.Builder.Dialogs;
 using DinnerBot.Models;
-using Microsoft.Bot.Connector;
+
 
 namespace DinnerBot.Dialogs
 {
     [Serializable]
     public class ReservationForm
     {
-
-        //public static IDialogContext context { get; set; }
-
         public static IForm<Reservation> BuildForm()
         {   
             return new FormBuilder<Reservation>()
