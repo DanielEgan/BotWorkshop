@@ -232,3 +232,42 @@ C:\Users\danie\Downloads\bots\AfterExercise3\DinnerBot\DinnerBot\bin\zh-hans\Mic
 C:\Users\danie\Downloads\bots\AfterExercise3\DinnerBot\DinnerBot\obj\Debug\DinnerBot.csprojResolveAssemblyReference.cache
 C:\Users\danie\Downloads\bots\AfterExercise3\DinnerBot\DinnerBot\obj\Debug\Bot Application1.dll
 C:\Users\danie\Downloads\bots\AfterExercise3\DinnerBot\DinnerBot\obj\Debug\Bot Application1.pdb
+C:\Projects\BotWorkshop\CSharpWorkshop\completedHOLs\AfterExercise4\DinnerBot\DinnerBot\bin\Bot Application1.dll.config
+C:\Projects\BotWorkshop\CSharpWorkshop\completedHOLs\AfterExercise4\DinnerBot\DinnerBot\bin\Bot Application1.dll
+C:\Projects\BotWorkshop\CSharpWorkshop\completedHOLs\AfterExercise4\DinnerBot\DinnerBot\bin\Bot Application1.pdb
+C:\Projects\BotWorkshop\CSharpWorkshop\completedHOLs\AfterExercise4\DinnerBot\DinnerBot\bin\Autofac.dll
+C:\Projects\BotWorkshop\CSharpWorkshop\completedHOLs\AfterExercise4\DinnerBot\DinnerBot\bin\Chronic.dll
+C:\Projects\BotWorkshop\CSharpWorkshop\completedHOLs\AfterExercise4\DinnerBot\DinnerBot\bin\Microsoft.Bot.Builder.dll
+C:\Projects\BotWorkshop\CSharpWorkshop\completedHOLs\AfterExercise4\DinnerBot\DinnerBot\bin\Microsoft.Bot.Connector.dll
+C:\Projects\BotWorkshop\CSharpWorkshop\completedHOLs\AfterExercise4\DinnerBot\DinnerBot\bin\Microsoft.IdentityModel.Protocol.Extensions.dll
+C:\Projects\BotWorkshop\CSharpWorkshop\completedHOLs\AfterExercise4\DinnerBot\DinnerBot\bin\Microsoft.Rest.ClientRuntime.dll
+C:\Projects\BotWorkshop\CSharpWorkshop\completedHOLs\AfterExercise4\DinnerBot\DinnerBot\bin\Microsoft.WindowsAzure.Configuration.dll
+C:\Projects\BotWorkshop\CSharpWorkshop\completedHOLs\AfterExercise4\DinnerBot\DinnerBot\bin\Newtonsoft.Json.dll
+C:\Projects\BotWorkshop\CSharpWorkshop\completedHOLs\AfterExercise4\DinnerBot\DinnerBot\bin\System.IdentityModel.Tokens.Jwt.dll
+C:\Projects\BotWorkshop\CSharpWorkshop\completedHOLs\AfterExercise4\DinnerBot\DinnerBot\bin\System.Net.Http.Formatting.dll
+C:\Projects\BotWorkshop\CSharpWorkshop\completedHOLs\AfterExercise4\DinnerBot\DinnerBot\bin\System.Web.Http.dll
+C:\Projects\BotWorkshop\CSharpWorkshop\completedHOLs\AfterExercise4\DinnerBot\DinnerBot\bin\System.Web.Http.WebHost.dll
+C:\Projects\BotWorkshop\CSharpWorkshop\completedHOLs\AfterExercise4\DinnerBot\DinnerBot\bin\Autofac.xml
+C:\Projects\BotWorkshop\CSharpWorkshop\completedHOLs\AfterExercise4\DinnerBot\DinnerBot\bin\Microsoft.Bot.Builder.xml
+C:\Projects\BotWorkshop\CSharpWorkshop\completedHOLs\AfterExercise4\DinnerBot\DinnerBot\bin\Microsoft.Bot.Connector.xml
+C:\Projects\BotWorkshop\CSharpWorkshop\completedHOLs\AfterExercise4\DinnerBot\DinnerBot\bin\Microsoft.IdentityModel.Protocol.Extensions.pdb
+C:\Projects\BotWorkshop\CSharpWorkshop\completedHOLs\AfterExercise4\DinnerBot\DinnerBot\bin\Microsoft.IdentityModel.Protocol.Extensions.xml
+C:\Projects\BotWorkshop\CSharpWorkshop\completedHOLs\AfterExercise4\DinnerBot\DinnerBot\bin\Microsoft.Rest.ClientRuntime.xml
+C:\Projects\BotWorkshop\CSharpWorkshop\completedHOLs\AfterExercise4\DinnerBot\DinnerBot\bin\Microsoft.WindowsAzure.Configuration.xml
+C:\Projects\BotWorkshop\CSharpWorkshop\completedHOLs\AfterExercise4\DinnerBot\DinnerBot\bin\Newtonsoft.Json.xml
+C:\Projects\BotWorkshop\CSharpWorkshop\completedHOLs\AfterExercise4\DinnerBot\DinnerBot\bin\System.IdentityModel.Tokens.Jwt.pdb
+C:\Projects\BotWorkshop\CSharpWorkshop\completedHOLs\AfterExercise4\DinnerBot\DinnerBot\bin\System.IdentityModel.Tokens.Jwt.xml
+C:\Projects\BotWorkshop\CSharpWorkshop\completedHOLs\AfterExercise4\DinnerBot\DinnerBot\bin\System.Net.Http.Formatting.xml
+C:\Projects\BotWorkshop\CSharpWorkshop\completedHOLs\AfterExercise4\DinnerBot\DinnerBot\bin\System.Web.Http.xml
+C:\Projects\BotWorkshop\CSharpWorkshop\completedHOLs\AfterExercise4\DinnerBot\DinnerBot\bin\System.Web.Http.WebHost.xml
+C:\Projects\BotWorkshop\CSharpWorkshop\completedHOLs\AfterExercise4\DinnerBot\DinnerBot\bin\ar\Microsoft.Bot.Builder.resources.dll
+C:\Projects\BotWorkshop\CSharpWorkshop\completedHOLs\AfterExercise4\DinnerBot\DinnerBot\bin\en\Microsoft.Bot.Builder.resources.dll
+C:\Projects\BotWorkshop\CSharpWorkshop\completedHOLs\AfterExercise4\DinnerBot\DinnerBot\bin\es\Microsoft.Bot.Builder.resources.dll
+C:\Projects\BotWorkshop\CSharpWorkshop\completedHOLs\AfterExercise4\DinnerBot\DinnerBot\bin\fa\Microsoft.Bot.Builder.resources.dll
+C:\Projects\BotWorkshop\CSharpWorkshop\completedHOLs\AfterExercise4\DinnerBot\DinnerBot\bin\fr\Microsoft.Bot.Builder.resources.dll
+C:\Projects\BotWorkshop\CSharpWorkshop\completedHOLs\AfterExercise4\DinnerBot\DinnerBot\bin\ja\Microsoft.Bot.Builder.resources.dll
+C:\Projects\BotWorkshop\CSharpWorkshop\completedHOLs\AfterExercise4\DinnerBot\DinnerBot\bin\ru\Microsoft.Bot.Builder.resources.dll
+C:\Projects\BotWorkshop\CSharpWorkshop\completedHOLs\AfterExercise4\DinnerBot\DinnerBot\bin\zh-hans\Microsoft.Bot.Builder.resources.dll
+C:\Projects\BotWorkshop\CSharpWorkshop\completedHOLs\AfterExercise4\DinnerBot\DinnerBot\obj\Debug\DinnerBot.csprojResolveAssemblyReference.cache
+C:\Projects\BotWorkshop\CSharpWorkshop\completedHOLs\AfterExercise4\DinnerBot\DinnerBot\obj\Debug\Bot Application1.dll
+C:\Projects\BotWorkshop\CSharpWorkshop\completedHOLs\AfterExercise4\DinnerBot\DinnerBot\obj\Debug\Bot Application1.pdb
