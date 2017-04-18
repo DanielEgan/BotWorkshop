@@ -6,14 +6,14 @@ using System.Linq;
 using System.Web;
 
 namespace DinnerBot.Models
-{   
+{
     [Serializable]
     public class Reservation
     {
-        public Reservation(string name )
+        public Reservation(string name)
         {
             this.Name = name;
-        } 
+        }
 
         public enum SpecialOccasionOptions
         {

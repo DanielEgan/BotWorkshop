@@ -33,26 +33,14 @@ namespace DinnerBot.Dialogs
         {
             try
             {
-                //check to see if we already have username stored
-                //If not, we will ask for it. 
-                string userName = String.Empty;
-                if (!context.UserData.TryGetValue<string>("Name", out userName))
-                {
-                    context.Call(new UserInfoDialog(), ResumeAfterUserInfoDialog);
-                }
-                else
-                {
-                    await context.PostAsync("Great, lets book a table for you. You will need to provide a few details.");
-                    var form = new FormDialog<Reservation>(
-                    new Reservation(context.UserData.Get<String>("Name")),
-                    ReservationForm.BuildForm,
-                    FormOptions.PromptInStart,
-                    null);
+                await context.PostAsync("Great, lets book a table for you. You will need to provide a few details.");
+                var form = new FormDialog<Reservation>(
+                new Reservation(context.UserData.Get<String>("Name")),
+                ReservationForm.BuildForm,
+                FormOptions.PromptInStart,
+                null);
 
-
-                    context.Call(form, this.ReservationFormComplete);
-                }
-
+                context.Call(form, this.ReservationFormComplete);
             }
             catch (Exception)
             {
