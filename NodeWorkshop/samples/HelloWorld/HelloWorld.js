@@ -5,7 +5,7 @@ var bot = new builder.UniversalBot(connector);
 
 bot.dialog('/', function (session) {
     session.send('Hello World');
-    session.beginDialog()
+    
 });
 
 
