@@ -1,0 +1,43 @@
+C:\Projects\Workshop1\DinnerBot\DinnerBot\bin\Bot Application.dll.config
+C:\Projects\Workshop1\DinnerBot\DinnerBot\bin\Bot Application.dll
+C:\Projects\Workshop1\DinnerBot\DinnerBot\bin\Bot Application.pdb
+C:\Projects\Workshop1\DinnerBot\DinnerBot\bin\Autofac.dll
+C:\Projects\Workshop1\DinnerBot\DinnerBot\bin\Chronic.dll
+C:\Projects\Workshop1\DinnerBot\DinnerBot\bin\Microsoft.Bot.Builder.Autofac.dll
+C:\Projects\Workshop1\DinnerBot\DinnerBot\bin\Microsoft.Bot.Builder.dll
+C:\Projects\Workshop1\DinnerBot\DinnerBot\bin\Microsoft.Bot.Connector.dll
+C:\Projects\Workshop1\DinnerBot\DinnerBot\bin\Microsoft.IdentityModel.Protocol.Extensions.dll
+C:\Projects\Workshop1\DinnerBot\DinnerBot\bin\Microsoft.Rest.ClientRuntime.dll
+C:\Projects\Workshop1\DinnerBot\DinnerBot\bin\Microsoft.WindowsAzure.Configuration.dll
+C:\Projects\Workshop1\DinnerBot\DinnerBot\bin\Newtonsoft.Json.dll
+C:\Projects\Workshop1\DinnerBot\DinnerBot\bin\System.IdentityModel.Tokens.Jwt.dll
+C:\Projects\Workshop1\DinnerBot\DinnerBot\bin\System.Net.Http.Formatting.dll
+C:\Projects\Workshop1\DinnerBot\DinnerBot\bin\System.Web.Http.dll
+C:\Projects\Workshop1\DinnerBot\DinnerBot\bin\System.Web.Http.WebHost.dll
+C:\Projects\Workshop1\DinnerBot\DinnerBot\bin\Autofac.xml
+C:\Projects\Workshop1\DinnerBot\DinnerBot\bin\Microsoft.Bot.Builder.xml
+C:\Projects\Workshop1\DinnerBot\DinnerBot\bin\Microsoft.Bot.Builder.Autofac.xml
+C:\Projects\Workshop1\DinnerBot\DinnerBot\bin\Microsoft.Bot.Connector.xml
+C:\Projects\Workshop1\DinnerBot\DinnerBot\bin\Microsoft.IdentityModel.Protocol.Extensions.pdb
+C:\Projects\Workshop1\DinnerBot\DinnerBot\bin\Microsoft.IdentityModel.Protocol.Extensions.xml
+C:\Projects\Workshop1\DinnerBot\DinnerBot\bin\Microsoft.WindowsAzure.Configuration.xml
+C:\Projects\Workshop1\DinnerBot\DinnerBot\bin\Newtonsoft.Json.xml
+C:\Projects\Workshop1\DinnerBot\DinnerBot\bin\System.IdentityModel.Tokens.Jwt.pdb
+C:\Projects\Workshop1\DinnerBot\DinnerBot\bin\System.IdentityModel.Tokens.Jwt.xml
+C:\Projects\Workshop1\DinnerBot\DinnerBot\bin\System.Net.Http.Formatting.xml
+C:\Projects\Workshop1\DinnerBot\DinnerBot\bin\System.Web.Http.xml
+C:\Projects\Workshop1\DinnerBot\DinnerBot\bin\System.Web.Http.WebHost.xml
+C:\Projects\Workshop1\DinnerBot\DinnerBot\bin\ar\Microsoft.Bot.Builder.resources.dll
+C:\Projects\Workshop1\DinnerBot\DinnerBot\bin\cs\Microsoft.Bot.Builder.resources.dll
+C:\Projects\Workshop1\DinnerBot\DinnerBot\bin\de-dE\Microsoft.Bot.Builder.resources.dll
+C:\Projects\Workshop1\DinnerBot\DinnerBot\bin\en\Microsoft.Bot.Builder.resources.dll
+C:\Projects\Workshop1\DinnerBot\DinnerBot\bin\es\Microsoft.Bot.Builder.resources.dll
+C:\Projects\Workshop1\DinnerBot\DinnerBot\bin\fa\Microsoft.Bot.Builder.resources.dll
+C:\Projects\Workshop1\DinnerBot\DinnerBot\bin\fr\Microsoft.Bot.Builder.resources.dll
+C:\Projects\Workshop1\DinnerBot\DinnerBot\bin\ja\Microsoft.Bot.Builder.resources.dll
+C:\Projects\Workshop1\DinnerBot\DinnerBot\bin\ru\Microsoft.Bot.Builder.resources.dll
+C:\Projects\Workshop1\DinnerBot\DinnerBot\bin\zh-hans\Microsoft.Bot.Builder.resources.dll
+C:\Projects\Workshop1\DinnerBot\DinnerBot\obj\Debug\DinnerBot.csprojResolveAssemblyReference.cache
+C:\Projects\Workshop1\DinnerBot\DinnerBot\obj\Debug\Bot Application.dll
+C:\Projects\Workshop1\DinnerBot\DinnerBot\obj\Debug\Bot Application.pdb
+C:\Projects\Workshop1\DinnerBot\DinnerBot\bin\AdaptiveCards.dll
