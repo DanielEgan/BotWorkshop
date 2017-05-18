@@ -9,20 +9,15 @@ using System.Threading.Tasks;
 using DinnerBot.Models;
 
 
-namespace DinnerBot.Dialogs
-{
-    [Serializable]
+namespace DinnerBot.Forms
+{   [Serializable]
     public class ReservationForm
     {
-        public static IForm<Reservation> BuildForm()
-        {   
-            return new FormBuilder<Reservation>()
-                .Field(new FieldReflector<Reservation>(nameof(Reservation.Name))
-                    .SetActive((state) =>
-                    {
-                        return String.IsNullOrEmpty(state.Name);
 
-                    }))
+        public static IForm<Reservation> BuildForm()
+        {
+            return new FormBuilder<Reservation>()
+                .Field(nameof(Reservation.Name))
                 .Field(nameof(Reservation.Email), validate: ValidateContactInformation)
                 .Field(nameof(Reservation.PhoneNumber))
                 .Field(nameof(Reservation.ReservationDate))

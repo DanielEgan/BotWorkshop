@@ -12,7 +12,7 @@ namespace DinnerBot.Dialogs
         public async Task StartAsync(IDialogContext context)
         {
             //Greet the user
-            await context.PostAsync(String.Format("Hey there {0}, how are you?", context.UserData.Get<String>("Name")));
+            await context.PostAsync("Hey there, how are you?");
 
             //call context.Done
             context.Done<object>(null);
