@@ -1,6 +1,0 @@
-﻿<?xml version="1.0" encoding="utf-8"?>
-<sitemanifest>
-  <IisApp path="C:\Projects\BotWorkshop\CSharpWorkshop\completedHOLs\AfterExercise3\DinnerBot\DinnerBot\obj\Release\Package\PackageTmp" managedRuntimeVersion="v4.0" />
-  <setAcl path="C:\Projects\BotWorkshop\CSharpWorkshop\completedHOLs\AfterExercise3\DinnerBot\DinnerBot\obj\Release\Package\PackageTmp" setAclResourceType="Directory" />
-  <setAcl path="C:\Projects\BotWorkshop\CSharpWorkshop\completedHOLs\AfterExercise3\DinnerBot\DinnerBot\obj\Release\Package\PackageTmp" setAclUser="anonymousAuthenticationUser" setAclResourceType="Directory" />
-</sitemanifest>

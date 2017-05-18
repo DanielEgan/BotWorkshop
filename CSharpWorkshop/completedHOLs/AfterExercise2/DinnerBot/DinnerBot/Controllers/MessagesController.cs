@@ -1,14 +1,9 @@
-﻿using System;
-using System.Linq;
-using System.Net;
+﻿using System.Net;
 using System.Net.Http;
 using System.Threading.Tasks;
 using System.Web.Http;
-using System.Web.Http.Description;
-using Newtonsoft.Json;
-using Microsoft.Bot.Connector;
 using Microsoft.Bot.Builder.Dialogs;
-using DinnerBot.Dialogs;
+using Microsoft.Bot.Connector;
 
 namespace DinnerBot
 {
@@ -23,7 +18,7 @@ namespace DinnerBot
         {
             if (activity.Type == ActivityTypes.Message)
             {
-                await Conversation.SendAsync(activity, () => new RootDialog());
+                await Conversation.SendAsync(activity, () => new Dialogs.RootDialog());
             }
             else
             {

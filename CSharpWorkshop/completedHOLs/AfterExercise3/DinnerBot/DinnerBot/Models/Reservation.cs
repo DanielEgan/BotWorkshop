@@ -1,15 +1,14 @@
-﻿using Microsoft.Bot.Builder.Dialogs;
-using Microsoft.Bot.Builder.FormFlow;
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Web;
+using Microsoft.Bot.Builder.FormFlow;
 
 namespace DinnerBot.Models
-{
-    [Serializable]
+{   [Serializable]
     public class Reservation
     {
+
         public Reservation(string name)
         {
             this.Name = name;
@@ -22,8 +21,6 @@ namespace DinnerBot.Models
             Engagement,
             none
         }
-
-
 
         [Prompt(new string[] { "What is your name?" })]
         public string Name { get; set; }
@@ -49,5 +46,9 @@ namespace DinnerBot.Models
         [Optional]
         [Describe("for how you enjoyed your experience with Dinner Bot today (optional)")]
         public double? Rating;
+
+
+
+
     }
 }

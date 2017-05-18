@@ -13,7 +13,6 @@ namespace DinnerBot.Dialogs
     {
         public async Task StartAsync(IDialogContext context)
         {
-            
             //Greet the user
             await context.PostAsync("Before we begin, we would like to know who we are talking to?");
             //call the respond method below
@@ -77,9 +76,11 @@ namespace DinnerBot.Dialogs
 
                 string message = ex.Message;
             }
-           
-            
+
+
         }
+
+
 
     }
 }

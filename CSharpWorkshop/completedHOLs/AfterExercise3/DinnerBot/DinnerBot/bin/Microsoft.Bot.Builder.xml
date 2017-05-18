@@ -4,19 +4,196 @@
         <name>Microsoft.Bot.Builder</name>
     </assembly>
     <members>
-        <member name="T:Microsoft.Bot.Builder.Dialogs.Internals.DialogModule">
+        <member name="M:Microsoft.Bot.Builder.Base.IEventLoop.PollAsync(System.Threading.CancellationToken)">
             <summary>
-            Autofac module for Dialog components.
+            Poll the target for any work to be done.
+            </summary>
+            <param name="token">A cancellation token.</param>
+            <returns>A task representing the poll operation.</returns>
+        </member>
+        <member name="T:Microsoft.Bot.Builder.Base.LocalizedScope">
+            <summary>
+            This class sets the ambient thread culture for a scope of code with a using-block.
             </summary>
         </member>
-        <member name="T:Microsoft.Bot.Builder.Dialogs.Internals.CachingBotDataStore_LastWriteWins">
+        <member name="M:Microsoft.Bot.Builder.Dialogs.Internals.Extensions.InterruptAsync``2(Microsoft.Bot.Builder.Dialogs.Internals.IDialogTask,Microsoft.Bot.Builder.Dialogs.IDialog{``0},``1,System.Threading.CancellationToken)">
             <summary>
-            Caches data for <see cref="T:Microsoft.Bot.Builder.Dialogs.Internals.BotDataBase`1"/> and wraps the data in <see cref="T:Microsoft.Bot.Connector.BotData"/> to be stored in <see cref="F:Microsoft.Bot.Builder.Dialogs.Internals.CachingBotDataStore_LastWriteWins.inner"/>
+            Interrupt the waiting dialog with a new dialog
             </summary>
-            <remarks> 
-            It sets <see cref="P:Microsoft.Bot.Connector.BotData.ETag"/> to "*" when it flushes the data to storage. 
+            <typeparam name="T">The type of result expected from the dialog.</typeparam>
+            <typeparam name="R">The type of the item posted to dialog.</typeparam>
+            <param name="task">The dialog task.</param>
+            <param name="dialog">The new interrupting dialog.</param>
+            <param name="item">The item to forward to the new interrupting dialog.</param>
+            <param name="token">The cancellation token.</param>
+            <returns>A task that represents the interruption operation.</returns>
+        </member>
+        <member name="T:Microsoft.Bot.Builder.Dialogs.Internals.IPostToBot">
+            <summary>
+            Methods to send a message from the user to the bot.
+            </summary>
+        </member>
+        <member name="M:Microsoft.Bot.Builder.Dialogs.Internals.IPostToBot.PostAsync(Microsoft.Bot.Connector.IActivity,System.Threading.CancellationToken)">
+            <summary>
+            Post an item (e.g. message or other external event) to the bot.
+            </summary>
+            <param name="activity">The item for the bot.</param>
+            <param name="token">The cancellation token.</param>
+            <returns>A task that represents the post operation.</returns>
+        </member>
+        <member name="T:Microsoft.Bot.Builder.Dialogs.Internals.SetAmbientThreadCulture">
+            <summary>
+            This IPostToBot service sets the ambient thread culture based on the <see cref="P:Microsoft.Bot.Connector.IMessageActivity.Locale"/>.
+            </summary>
+        </member>
+        <member name="T:Microsoft.Bot.Builder.Dialogs.Internals.SerializeByConversation">
+            <summary>
+            This IPostToBot service serializes the execution of a particular conversation's code to avoid
+            concurrency issues.
+            </summary>
+        </member>
+        <member name="T:Microsoft.Bot.Builder.Dialogs.Internals.PostUnhandledExceptionToUser">
+            <summary>
+            This IPostToBot service converts any unhandled exceptions to a message sent to the user.
+            </summary>
+        </member>
+        <member name="M:Microsoft.Bot.Builder.Dialogs.Internals.IBotDataStore`1.LoadAsync(Microsoft.Bot.Builder.Dialogs.IAddress,Microsoft.Bot.Builder.Dialogs.Internals.BotStoreType,System.Threading.CancellationToken)">
+            <summary>
+            Return BotData with Data pointing to a JObject or an empty BotData() record with ETag:""
+            </summary>
+            <param name="key"> The key.</param>
+            <param name="botStoreType"> The bot store type.</param>
+            <param name="cancellationToken"> The cancellation token.</param>
+            <returns>Bot record that is stored for this key, or "empty" bot record ready to be stored</returns>
+        </member>
+        <member name="M:Microsoft.Bot.Builder.Dialogs.Internals.IBotDataStore`1.SaveAsync(Microsoft.Bot.Builder.Dialogs.IAddress,Microsoft.Bot.Builder.Dialogs.Internals.BotStoreType,`0,System.Threading.CancellationToken)">
+            <summary>
+            Save a BotData using the ETag.
+            Etag consistency checks
+                If ETag is null or empty, this will set the value if nobody has set it yet
+                If ETag is "*" then this will unconditionally set the value
+                If ETag matches then this will update the value if it is unchanged.
+            If Data is null this removes record, otherwise it stores
+            </summary>
+            <param name="key"> The key.</param>
+            <param name="botStoreType">The bot store type.</param>
+            <param name="data"> The data that should be saved.</param>
+            <param name="cancellationToken"> The cancellation token.</param>
+            <returns>throw HttpException(HttpStatusCode.PreconditionFailed) if update fails</returns>
+        </member>
+        <member name="T:Microsoft.Bot.Builder.Dialogs.Internals.InMemoryDataStore">
+            <summary>
+            Volitile in-memory implementation of <see cref="T:Microsoft.Bot.Builder.Dialogs.Internals.IBotDataStore`1"/>
+            </summary>
+        </member>
+        <member name="T:Microsoft.Bot.Builder.Dialogs.Internals.ConnectorStore">
+            <summary>
+            implementation of IBotDatStore which uses the State REST API on state.botframework.com to store data 
+            </summary>
+        </member>
+        <member name="T:Microsoft.Bot.Builder.Dialogs.Internals.CachingBotDataStoreConsistencyPolicy">
+            <summary>
+            The data consistency policy for <see cref="T:Microsoft.Bot.Builder.Dialogs.Internals.CachingBotDataStore"/>
+            </summary>
+        </member>
+        <member name="F:Microsoft.Bot.Builder.Dialogs.Internals.CachingBotDataStoreConsistencyPolicy.LastWriteWins">
+            <summary>
+            Causes <see cref="T:Microsoft.Bot.Builder.Dialogs.Internals.CachingBotDataStore"/> to set <see cref="P:Microsoft.Bot.Connector.BotData.ETag"/> to "*" when it flushes the data to storage. 
             As a result last write will overwrite the data.
+            </summary>
+        </member>
+        <member name="F:Microsoft.Bot.Builder.Dialogs.Internals.CachingBotDataStoreConsistencyPolicy.ETagBasedConsistency">
+            <summary>
+            Causes <see cref="T:Microsoft.Bot.Builder.Dialogs.Internals.CachingBotDataStore"/> to write data with the same <see cref="P:Microsoft.Bot.Connector.BotData.ETag"/> 
+            returned by <see cref="F:Microsoft.Bot.Builder.Dialogs.Internals.CachingBotDataStore.inner"/>. As a result <see cref="M:Microsoft.Bot.Builder.Dialogs.Internals.IBotDataStore`1.FlushAsync(Microsoft.Bot.Builder.Dialogs.IAddress,System.Threading.CancellationToken)"/>
+            might fail because of ETag inconsistencies.
+            </summary>
+        </member>
+        <member name="T:Microsoft.Bot.Builder.Dialogs.Internals.CachingBotDataStore">
+            <summary>
+            Caches data for <see cref="T:Microsoft.Bot.Builder.Dialogs.Internals.BotDataBase`1"/> and wraps the data in <see cref="T:Microsoft.Bot.Connector.BotData"/> to be stored in <see cref="F:Microsoft.Bot.Builder.Dialogs.Internals.CachingBotDataStore.inner"/>
+            </summary>
+        </member>
+        <member name="T:Microsoft.Bot.Builder.Dialogs.Internals.IBotToUser">
+            <summary>
+            Methods to send a message from the bot to the user. 
+            </summary>
+        </member>
+        <member name="M:Microsoft.Bot.Builder.Dialogs.Internals.IBotToUser.PostAsync(Microsoft.Bot.Connector.IMessageActivity,System.Threading.CancellationToken)">
+            <summary>
+            Post a message to be sent to the user.
+            </summary>
+            <param name="message">The message for the user.</param>
+            <param name="cancellationToken">The cancellation token.</param>
+            <returns>A task that represents the post operation.</returns>
+        </member>
+        <member name="M:Microsoft.Bot.Builder.Dialogs.Internals.IBotToUser.MakeMessage">
+            <summary>
+            Make a message.
+            </summary>
+            <returns>The new message.</returns>
+        </member>
+        <member name="T:Microsoft.Bot.Builder.Dialogs.Internals.DialogRouter">
+            <summary>
+            Scorable for Dialog module routing.
+            </summary>
+        </member>
+        <member name="T:Microsoft.Bot.Builder.Dialogs.Internals.IDialogSystem">
+            <summary>
+            The dialog system represents the top-level interface for the dialog tasks and their event loop.
+            </summary>
+        </member>
+        <member name="T:Microsoft.Bot.Builder.Dialogs.Internals.ScoringEventLoop`1">
+            <summary>
+            This event loop dispatches incoming activities to a scorable action, and then if the
+            scorable action does not match, some inner consumer of activities (usually the dialog system).
+            </summary>
+        </member>
+        <member name="T:Microsoft.Bot.Builder.Dialogs.Internals.DialogTask">
+            <summary>
+            A dialog task is a
+            1. single <see cref="T:Microsoft.Bot.Builder.Dialogs.Internals.IDialogStack"/> stack of <see cref="T:Microsoft.Bot.Builder.Dialogs.IDialog"/> frames, waiting on the next <see cref="T:Microsoft.Bot.Connector.IActivity"/>
+            2. the <see cref="T:Microsoft.Bot.Builder.Base.IEventProducer`1"/> queue of activity events necessary to satisfy those waits
+            2. the <see cref="T:Microsoft.Bot.Builder.Base.IEventLoop"/> loop to execute that dialog code once the waits are satisfied
+            </summary>
+        </member>
+        <member name="T:Microsoft.Bot.Builder.Dialogs.Internals.DialogTask.IThunk">
+            <summary>
+            Adjust the calling convention from Dialog's to Fiber's delegates.
+            </summary>
+            <remarks>
+            https://en.wikipedia.org/wiki/Thunk
             </remarks>
+        </member>
+        <member name="T:Microsoft.Bot.Builder.Dialogs.Internals.DialogTask.ThunkStart">
+            <summary>
+            Adjust the calling convention from Dialog's to Fiber's delegates
+            for IDialog.StartAsync.
+            </summary>
+        </member>
+        <member name="T:Microsoft.Bot.Builder.Dialogs.Internals.DialogTask.ThunkResume`1">
+            <summary>
+            Adjust the calling convention from Dialog's to Fiber's delegates
+            for IDialog's <see cref="T:Microsoft.Bot.Builder.Dialogs.ResumeAfter`1"/>. 
+            </summary>
+        </member>
+        <member name="T:Microsoft.Bot.Builder.Dialogs.Internals.ReactiveDialogTask">
+            <summary>
+            A reactive dialog task (in contrast to a proactive dialog task) is a dialog task that
+            starts some root dialog when it receives the first <see cref="T:Microsoft.Bot.Connector.IActivity"/> activity. 
+            </summary>
+        </member>
+        <member name="T:Microsoft.Bot.Builder.Dialogs.Internals.ExceptionTranslationDialogTask">
+            <summary>
+            This dialog task translates from the more orthogonal (opaque) fiber exceptions
+            to the more readable dialog programming model exceptions.
+            </summary>
+        </member>
+        <member name="T:Microsoft.Bot.Builder.Dialogs.Internals.PersistentDialogTask">
+            <summary>
+            This dialog task loads the dialog stack from <see cref="T:Microsoft.Bot.Builder.Dialogs.Internals.IBotData"/> before handling the incoming
+            activity and saves the dialog stack to <see cref="T:Microsoft.Bot.Builder.Dialogs.Internals.IBotData"/> afterwards. 
+            </summary>
         </member>
         <member name="T:Microsoft.Bot.Builder.Dialogs.Internals.IConnectorClientFactory">
             <summary>
@@ -59,6 +236,13 @@
             <param name="child">The child dialog.</param>
             <param name="resume">The method to resume when the child dialog has completed.</param>
         </member>
+        <member name="M:Microsoft.Bot.Builder.Dialogs.Internals.IDialogStack.Post``1(``0,Microsoft.Bot.Builder.Dialogs.ResumeAfter{``0})">
+            <summary>
+            Post an internal event to the queue.
+            </summary>
+            <param name="event">The event to post to the queue.</param>
+            <param name="resume">The method to resume when the event has been delivered.</param>
+        </member>
         <member name="M:Microsoft.Bot.Builder.Dialogs.Internals.IDialogStack.Forward``2(Microsoft.Bot.Builder.Dialogs.IDialog{``0},Microsoft.Bot.Builder.Dialogs.ResumeAfter{``0},``1,System.Threading.CancellationToken)">
             <summary>
             Call a child dialog, add it to the top of the stack and post the item to the child dialog.
@@ -84,30 +268,37 @@
             </summary>
             <param name="error">The error.</param>
         </member>
-        <member name="M:Microsoft.Bot.Builder.Dialogs.Internals.IDialogStack.PollAsync(System.Threading.CancellationToken)">
-            <summary>
-            Poll the dialog task for any work to be done.
-            </summary>
-            <param name="token">A cancellation token.</param>
-            <returns>A task representing the poll operation.</returns>
-        </member>
         <member name="M:Microsoft.Bot.Builder.Dialogs.Internals.IDialogStack.Reset">
             <summary>
             Resets the stack.
             </summary>
         </member>
-        <member name="T:Microsoft.Bot.Builder.Dialogs.Internals.IPostToBot">
+        <member name="P:Microsoft.Bot.Builder.Dialogs.Internals.IDialogTasks.DialogTasks">
             <summary>
-            Methods to send a message from the user to the bot.
+            The list of <see cref="T:Microsoft.Bot.Builder.Dialogs.Internals.IDialogTask"/>
             </summary>
         </member>
-        <member name="M:Microsoft.Bot.Builder.Dialogs.Internals.IPostToBot.PostAsync``1(``0,System.Threading.CancellationToken)">
+        <member name="M:Microsoft.Bot.Builder.Dialogs.Internals.IDialogTasks.CreateDialogTask">
             <summary>
-            Post an item (e.g. message or other external event) to the bot.
+            Creates a new <see cref="T:Microsoft.Bot.Builder.Dialogs.Internals.IDialogTask"/> and add it to <see cref="P:Microsoft.Bot.Builder.Dialogs.Internals.IDialogTasks.DialogTasks"/>
             </summary>
-            <param name="item">The item for the bot.</param>
-            <param name="token">The cancellation token.</param>
-            <returns>A task that represents the post operation.</returns>
+        </member>
+        <member name="M:Microsoft.Bot.Builder.Dialogs.Internals.IDialogTaskManager.LoadDialogTasks(System.Threading.CancellationToken)">
+            <summary>
+            Loads the <see cref="P:Microsoft.Bot.Builder.Dialogs.Internals.IDialogTasks.DialogTasks"/> from <see cref="T:Microsoft.Bot.Builder.Dialogs.IBotDataBag"/>.
+            </summary>
+            <param name="token"> The cancellation token.</param>
+        </member>
+        <member name="M:Microsoft.Bot.Builder.Dialogs.Internals.IDialogTaskManager.FlushDialogTasks(System.Threading.CancellationToken)">
+            <summary>
+            Flushes the <see cref="T:Microsoft.Bot.Builder.Dialogs.Internals.IDialogTask"/> in <see cref="P:Microsoft.Bot.Builder.Dialogs.Internals.IDialogTasks.DialogTasks"/>
+            </summary>
+            <param name="token"> The cancellation token.</param>
+        </member>
+        <member name="T:Microsoft.Bot.Builder.Dialogs.Internals.DialogTaskManager">
+            <summary>
+            This class is responsible for managing the set of dialog tasks.
+            </summary>
         </member>
         <member name="T:Microsoft.Bot.Builder.Dialogs.Internals.IBotData">
             <summary>
@@ -140,25 +331,6 @@
             Flushes the bot data to <see cref="T:Microsoft.Bot.Builder.Dialogs.Internals.IBotDataStore`1"/>
             </summary>
             <param name="cancellationToken">The cancellation token.</param>
-        </member>
-        <member name="T:Microsoft.Bot.Builder.Dialogs.Internals.IBotToUser">
-            <summary>
-            Methods to send a message from the bot to the user. 
-            </summary>
-        </member>
-        <member name="M:Microsoft.Bot.Builder.Dialogs.Internals.IBotToUser.PostAsync(Microsoft.Bot.Connector.IMessageActivity,System.Threading.CancellationToken)">
-            <summary>
-            Post a message to be sent to the user.
-            </summary>
-            <param name="message">The message for the user.</param>
-            <param name="cancellationToken">The cancellation token.</param>
-            <returns>A task that represents the post operation.</returns>
-        </member>
-        <member name="M:Microsoft.Bot.Builder.Dialogs.Internals.IBotToUser.MakeMessage">
-            <summary>
-            Make a message.
-            </summary>
-            <returns>The new message.</returns>
         </member>
         <member name="T:Microsoft.Bot.Builder.Dialogs.CommandDialog`1">
             <summary> Dialog that dispatches based on a regex matching input. </summary>
@@ -201,47 +373,12 @@
             <param name="resultHandler"> Optional result handler to be called if handler is creating a chaild dialog. </param>
             <returns> A CommandDialog. </returns>
         </member>
-        <member name="T:Microsoft.Bot.Builder.Dialogs.Conversation">
-            <summary>
-            The top level composition root for the SDK.
-            </summary>
-        </member>
-        <member name="M:Microsoft.Bot.Builder.Dialogs.Conversation.SendAsync(Microsoft.Bot.Connector.IMessageActivity,System.Func{Microsoft.Bot.Builder.Dialogs.IDialog{System.Object}},System.Threading.CancellationToken)">
-            <summary>
-            Process an incoming message within the conversation.
-            </summary>
-            <remarks>
-            This method:
-            1. Instantiates and composes the required components.
-            2. Deserializes the dialog state (the dialog stack and each dialog's state) from the <paramref name="toBot"/> <see cref="T:Microsoft.Bot.Connector.IMessageActivity"/>.
-            3. Resumes the conversation processes where the dialog suspended to wait for a <see cref="T:Microsoft.Bot.Connector.IMessageActivity"/>.
-            4. Queues <see cref="T:Microsoft.Bot.Connector.IMessageActivity"/>s to be sent to the user.
-            5. Serializes the updated dialog state in the messages to be sent to the user.
-            
-            The <paramref name="MakeRoot"/> factory method is invoked for new conversations only,
-            because existing conversations have the dialog stack and state serialized in the <see cref="T:Microsoft.Bot.Connector.IMessageActivity"/> data.
-            </remarks>
-            <param name="toBot">The message sent to the bot.</param>
-            <param name="MakeRoot">The factory method to make the root dialog.</param>
-            <param name="token">The cancellation token.</param>
-            <returns>A task that represents the message to send inline back to the user.</returns>
-        </member>
-        <member name="M:Microsoft.Bot.Builder.Dialogs.Conversation.ResumeAsync``1(Microsoft.Bot.Builder.Dialogs.ResumptionCookie,``0,System.Threading.CancellationToken)">
-            <summary>
-            Resume a conversation and post the data to the dialog waiting.
-            </summary>
-            <typeparam name="T"> Type of the data. </typeparam>
-            <param name="resumptionCookie"> The id of the bot.</param>
-            <param name="toBot"> The data sent to bot.</param>
-            <param name="token"> The cancellation token.</param>
-            <returns> A task that represent the message to send back to the user after resumption of the conversation.</returns>
-        </member>
         <member name="T:Microsoft.Bot.Builder.Dialogs.Chain">
             <summary>
             A fluent, chainable interface for IDialogs.
             </summary>
         </member>
-        <member name="T:Microsoft.Bot.Builder.Dialogs.Chain.Continutation`2">
+        <member name="T:Microsoft.Bot.Builder.Dialogs.Chain.Continuation`2">
             <summary>
             When the antecedent <see cref="T:Microsoft.Bot.Builder.Dialogs.IDialog`1"/> has completed, execute this continuation method to construct the next <see cref="T:Microsoft.Bot.Builder.Dialogs.IDialog`1"/>.
             </summary>
@@ -266,6 +403,16 @@
             <typeparam name="T">The type of the dialog.</typeparam>
             <param name="antecedent">The antecedent <see cref="T:Microsoft.Bot.Builder.Dialogs.IDialog`1"/>.</param>
             <param name="callback">The callback method.</param>
+            <returns>The antecedent dialog.</returns>
+        </member>
+        <member name="M:Microsoft.Bot.Builder.Dialogs.Chain.Then``2(Microsoft.Bot.Builder.Dialogs.IDialog{``0},System.Func{Microsoft.Bot.Builder.Dialogs.IBotContext,Microsoft.Bot.Builder.Dialogs.IAwaitable{``0},System.Threading.Tasks.Task{``1}})">
+            <summary>
+            Execute an action after the <see cref="T:Microsoft.Bot.Builder.Dialogs.IDialog`1"/> completes. 
+            </summary>
+            <typeparam name="T">The type of the dialog.</typeparam>
+            <typeparam name="R">They type returned by action.</typeparam>
+            <param name="Antecedent">The antecedent <see cref="T:Microsoft.Bot.Builder.Dialogs.IDialog`1"/>.</param>
+            <param name="Action">The action that will be called after the antecedent dialog completes.</param>
             <returns>The antecedent dialog.</returns>
         </member>
         <member name="M:Microsoft.Bot.Builder.Dialogs.Chain.PostToUser``1(Microsoft.Bot.Builder.Dialogs.IDialog{``0})">
@@ -293,7 +440,17 @@
             </remarks>
             <returns> The dialog that dispatches the incoming message from the user to chain.</returns>
         </member>
-        <member name="M:Microsoft.Bot.Builder.Dialogs.Chain.ContinueWith``2(Microsoft.Bot.Builder.Dialogs.IDialog{``0},Microsoft.Bot.Builder.Dialogs.Chain.Continutation{``0,``1})">
+        <member name="M:Microsoft.Bot.Builder.Dialogs.Chain.PostEvent``2(Microsoft.Bot.Builder.Dialogs.IDialog{``0},``1)">
+            <summary>
+            When the antecedent <see cref="T:Microsoft.Bot.Builder.Dialogs.IDialog`1"/> has completed, post the item to the event queue.
+            </summary>
+            <typeparam name="T">The type of the antecedent dialog.</typeparam>
+            <typeparam name="E">The type of the event.</typeparam>
+            <param name="antecedent">The antecedent <see cref="T:Microsoft.Bot.Builder.Dialogs.IDialog`1"/>.</param>
+            <param name="event">The event.</param>
+            <returns>The result from the antecedent <see cref="T:Microsoft.Bot.Builder.Dialogs.IDialog`1"/>.</returns>
+        </member>
+        <member name="M:Microsoft.Bot.Builder.Dialogs.Chain.ContinueWith``2(Microsoft.Bot.Builder.Dialogs.IDialog{``0},Microsoft.Bot.Builder.Dialogs.Chain.Continuation{``0,``1})">
             <summary>
             When the antecedent <see cref="T:Microsoft.Bot.Builder.Dialogs.IDialog`1"/> has completed, execute the continuation to produce the next <see cref="T:Microsoft.Bot.Builder.Dialogs.IDialog`1"/>.
             </summary>
@@ -353,10 +510,53 @@
             <summary>
             Call the voided <see cref="T:Microsoft.Bot.Builder.Dialogs.IDialog`1"/>, ignore the result, then restart the original dialog wait.
             </summary>
+            <remarks>
+            The purpose of this method is to wrap an antecedent dialog A with a new dialog D to push on the stack
+            on top of the existing stack top dialog L.
+            1. D will call A.
+            2. D will receive the value of A when A is done.
+            3. D will re-initiate the typed wait (often for a message) for which a method of L was waiting
+            4. D will receive that value of the re-initiated typed wait.
+            5. D will return that value of the typed wait to L.
+            This depends on the symmetry of IDialogStack.Done and IDialogStack.Wait in how they satisfy typed waits.
+            </remarks>
             <typeparam name="T">The type of the voided dialog.</typeparam>
             <typeparam name="R">The type of the original dialog wait.</typeparam>
             <param name="antecedent">The voided dialog.</param>
             <returns>The dialog that produces the item to satisfy the original wait.</returns>
+        </member>
+        <member name="M:Microsoft.Bot.Builder.Dialogs.Chain.Void``1(Microsoft.Bot.Builder.Dialogs.IDialog{``0},Microsoft.Bot.Builder.Dialogs.Internals.IDialogStack)">
+            <summary>
+            Call the voided <see cref="T:Microsoft.Bot.Builder.Dialogs.IDialog`1"/>, ignore the result, then restart the original dialog wait.
+            </summary>
+            <remarks>
+            (value types don't support generic parameter variance - so this reflection-based method may not work)
+            It's okay to loose type information (i.e. IDialog{object}) because voided dialogs are called with a null 
+            <see cref="T:Microsoft.Bot.Builder.Dialogs.ResumeAfter`1"/> because they are hacking the stack to satisfy the wait of the interrupted dialog. 
+            </remarks>
+            <typeparam name="T">The type of the voided dialog.</typeparam>
+            <param name="antecedent">The voided dialog.</param>
+            <param name="stack">The dialog stack.</param>
+            <returns>The dialog that produces the item to satisfy the original wait.</returns>
+        </member>
+        <member name="M:Microsoft.Bot.Builder.Dialogs.Chain.Catch``2(Microsoft.Bot.Builder.Dialogs.IDialog{``0},System.Func{Microsoft.Bot.Builder.Dialogs.IDialog{``0},``1,Microsoft.Bot.Builder.Dialogs.IDialog{``0}})">
+            <summary>
+            When the antecedent <see cref="T:Microsoft.Bot.Builder.Dialogs.IDialog`1"/> has completed, catch and handle any exceptions of type <typeparamref name="E"/>.
+            </summary>
+            <typeparam name="T">The type returned by the antecedent dialog.</typeparam>
+            <typeparam name="E">The type of exception to catch and handle.</typeparam>
+            <param name="antecedent">The antecedent dialog <see cref="T:Microsoft.Bot.Builder.Dialogs.IDialog`1"/>.</param>
+            <param name="block">The lambda expression representing the catch block handler.</param>
+            <returns>The result of the catch block handler if there is an exception of type <typeparamref name="E"/>.</returns>
+        </member>
+        <member name="M:Microsoft.Bot.Builder.Dialogs.Chain.Catch``1(Microsoft.Bot.Builder.Dialogs.IDialog{``0},System.Func{Microsoft.Bot.Builder.Dialogs.IDialog{``0},System.Exception,Microsoft.Bot.Builder.Dialogs.IDialog{``0}})">
+            <summary>
+            When the antecedent <see cref="T:Microsoft.Bot.Builder.Dialogs.IDialog`1"/> has completed, catch and handle any exceptions.
+            </summary>
+            <typeparam name="T">The type returned by the antecedent dialog.</typeparam>
+            <param name="antecedent">The antecedent dialog <see cref="T:Microsoft.Bot.Builder.Dialogs.IDialog`1"/>.</param>
+            <param name="block">The lambda expression representing the catch block handler.</param>
+            <returns>The result of the catch block handler if there is an exception.</returns>
         </member>
         <member name="M:Microsoft.Bot.Builder.Dialogs.Chain.DefaultIfException``2(Microsoft.Bot.Builder.Dialogs.IDialog{``0})">
             <summary>
@@ -398,6 +598,16 @@
             <param name="item"> The value to be wrapped.</param>
             <returns> The <see cref="T:Microsoft.Bot.Builder.Dialogs.IDialog`1"/> that wraps the value.</returns>
         </member>
+        <member name="M:Microsoft.Bot.Builder.Dialogs.Chain.While``1(Microsoft.Bot.Builder.Dialogs.IDialog{``0},System.Func{``0,Microsoft.Bot.Builder.Dialogs.IDialog{System.Boolean}},System.Func{``0,Microsoft.Bot.Builder.Dialogs.IDialog{``0}})">
+            <summary>
+            Create a <see cref="T:Microsoft.Bot.Builder.Dialogs.IDialog`1"/> that represents a while loop.
+            </summary>
+            <typeparam name="T">The type of the value.</typeparam>
+            <param name="initial">The value if <paramref name="test"/> is never true.</param>
+            <param name="test">The test to enter the while loop <paramref name="body"/>.</param>
+            <param name="body">The body of the while loop.</param>
+            <returns>Zero or the last value returned by the <paramref name="body"/> of the while loop.</returns>
+        </member>
         <member name="M:Microsoft.Bot.Builder.Dialogs.Chain.Fold``1(Microsoft.Bot.Builder.Dialogs.IDialog{System.Collections.Generic.IEnumerable{Microsoft.Bot.Builder.Dialogs.IDialog{``0}}},System.Func{``0,``0,``0})">
             <summary>
             Fold items from an enumeration of dialogs.
@@ -406,6 +616,17 @@
             <param name="antecedent">The antecedent dialog that produces an enumeration of <see cref="T:Microsoft.Bot.Builder.Dialogs.IDialog`1"/>.</param>
             <param name="folder">The accumulator for the dialog enumeration.</param>
             <returns>The accumulated result.</returns>
+        </member>
+        <member name="M:Microsoft.Bot.Builder.Dialogs.Chain.WithScorable``3(Microsoft.Bot.Builder.Dialogs.IDialog{``0},Microsoft.Bot.Builder.Scorables.IScorable{``1,``2})">
+            <summary>
+            Decorate a dialog with a scorable, so that a scorable can participate on the dialog stack.
+            </summary>
+            <typeparam name="T">The type of the dialog.</typeparam>
+            <typeparam name="Item">The type of the item scored by the scorable.</typeparam>
+            <typeparam name="Score">The type of the scope produced by the scorable.</typeparam>
+            <param name="antecedent">The antecedent dialog.</param>
+            <param name="scorable">The scorable.</param>
+            <returns>The dialog augmented with the scorables.</returns>
         </member>
         <member name="M:Microsoft.Bot.Builder.Dialogs.Chain.Case``2(System.Func{``0,System.Boolean},Microsoft.Bot.Builder.Dialogs.ContextualSelector{``0,``1})">
             <summary>
@@ -526,6 +747,40 @@
             </summary>
             <param name="selector"> The contextual selector that will be called in default case.</param>
         </member>
+        <member name="T:Microsoft.Bot.Builder.Dialogs.DialogStackException">
+            <summary>
+            The root of the exception hierarchy related to <see cref="T:Microsoft.Bot.Builder.Dialogs.Internals.IDialogStack"/> .
+            </summary>
+        </member>
+        <member name="M:Microsoft.Bot.Builder.Dialogs.DialogStackException.#ctor(System.String,System.Exception)">
+            <summary>
+            Initializes a new instance of the DialogStackException class with a specified error message.
+            </summary>
+            <param name="message">The error message that explains the reason for the exception.</param>
+            <param name="inner">The exception that is the cause of the current exception, or a null reference (Nothing in Visual Basic) if no inner exception is specified.</param>
+        </member>
+        <member name="T:Microsoft.Bot.Builder.Dialogs.NoResumeHandlerException">
+            <summary>
+            The exception representing no resume handler specified for the dialog stack.
+            </summary>
+        </member>
+        <member name="M:Microsoft.Bot.Builder.Dialogs.NoResumeHandlerException.#ctor(System.Exception)">
+            <summary>
+            Initializes a new instance of the NoResumeHandlerException class.
+            </summary>
+            <param name="inner">The exception that is the cause of the current exception, or a null reference (Nothing in Visual Basic) if no inner exception is specified.</param>
+        </member>
+        <member name="T:Microsoft.Bot.Builder.Dialogs.MultipleResumeHandlerException">
+            <summary>
+            The exception representing multiple resume handlers specified for the dialog stack.
+            </summary>
+        </member>
+        <member name="M:Microsoft.Bot.Builder.Dialogs.MultipleResumeHandlerException.#ctor(System.Exception)">
+            <summary>
+            Initializes a new instance of the MultipleResumeHandlerException class.
+            </summary>
+            <param name="inner">The exception that is the cause of the current exception, or a null reference (Nothing in Visual Basic) if no inner exception is specified.</param>
+        </member>
         <member name="T:Microsoft.Bot.Builder.Dialogs.PromptException">
             <summary>
             The root of the exception hierarchy related to prompts.
@@ -535,7 +790,7 @@
             <summary>
             Initializes a new instance of the PromptException class with a specified error message.
             </summary>
-            <param name="message">The message that describes the error.</param>
+            <param name="message">The error message that explains the reason for the exception.</param>
         </member>
         <member name="T:Microsoft.Bot.Builder.Dialogs.TooManyAttemptsException">
             <summary>
@@ -546,16 +801,53 @@
             <summary>
             Initializes a new instance of the TooManyAttemptsException class with a specified error message.
             </summary>
-            <param name="message">The message that describes the error.</param>
+            <param name="message">The error message that explains the reason for the exception.</param>
+        </member>
+        <member name="T:Microsoft.Bot.Builder.Dialogs.IAddress">
+            <summary>
+            The key that minimally and completely identifies a bot's conversation with a user on a channel. 
+            </summary>
+        </member>
+        <member name="T:Microsoft.Bot.Builder.Dialogs.Address">
+            <summary>
+            The key that minimally and completely identifies a bot's conversation with a user on a channel. 
+            </summary>
+        </member>
+        <member name="T:Microsoft.Bot.Builder.Dialogs.ConversationAddressComparer">
+            <summary>
+            Compare two Address instances for equality, excluding the user information.
+            </summary>
+            <remarks>
+            This equality comparer excludes the user from the Address identity
+            so that dialog execution can be serialized by conversation, thereby
+            making it less likely to encounter 412 "precondition failed" when
+            updating the bot state data bags with optimistic concurrency.  Updates
+            to the user's data bags may still conflict across multiple conversations.
+            </remarks>
+        </member>
+        <member name="T:Microsoft.Bot.Builder.Dialogs.DispatchDialog`1">
+            <summary>
+            A dialog specialized to dispatch an IScorable.
+            </summary>
+            <typeparam name="TResult">The result type.</typeparam>
+        </member>
+        <member name="T:Microsoft.Bot.Builder.Dialogs.DispatchDialog">
+            <summary>
+            A dialog specialized to dispatch an IScorable.
+            </summary>
+            <remarks>
+            This non-generic dialog is intended for use as a top-level dialog that will not
+            return to any calling parent dialog (and therefore the result type is object).
+            </remarks>
         </member>
         <member name="T:Microsoft.Bot.Builder.Dialogs.ResumptionCookie">
             <summary>
             The resumption cookie that can be used to resume a conversation with a user. 
             </summary>
         </member>
-        <member name="P:Microsoft.Bot.Builder.Dialogs.ResumptionCookie.UserId">
+        <member name="P:Microsoft.Bot.Builder.Dialogs.ResumptionCookie.Address">
             <summary>
-            The user Id.
+            The key that minimally and completely identifies a bot's conversation with a user on a channel.
             </summary>
         </member>
         <member name="P:Microsoft.Bot.Builder.Dialogs.ResumptionCookie.UserName">
@@ -563,29 +855,17 @@
             The user name.
             </summary>
         </member>
-        <member name="P:Microsoft.Bot.Builder.Dialogs.ResumptionCookie.ChannelId">
+        <member name="P:Microsoft.Bot.Builder.Dialogs.ResumptionCookie.IsTrustedServiceUrl">
             <summary>
-            The channelId.
+            True if the <see cref="P:Microsoft.Bot.Builder.Dialogs.IAddress.ServiceUrl"/> is trusted; False otherwise.
             </summary>
-        </member>
-        <member name="P:Microsoft.Bot.Builder.Dialogs.ResumptionCookie.BotId">
-            <summary>
-            The bot Id. 
-            </summary>
-        </member>
-        <member name="P:Microsoft.Bot.Builder.Dialogs.ResumptionCookie.ServiceUrl">
-            <summary>
-            The service url.
-            </summary>
+            <remarks> Conversation.ResumeAsync adds 
+            the host of the <see cref="P:Microsoft.Bot.Builder.Dialogs.IAddress.ServiceUrl"/> to <see cref="F:Microsoft.Bot.Connector.MicrosoftAppCredentials.TrustedHostNames"/> if this flag is True.
+            </remarks>
         </member>
         <member name="P:Microsoft.Bot.Builder.Dialogs.ResumptionCookie.IsGroup">
             <summary>
             The IsGroup flag for conversation.
-            </summary>
-        </member>
-        <member name="P:Microsoft.Bot.Builder.Dialogs.ResumptionCookie.ConversationId">
-            <summary>
-            The Id of the conversation that will be resumed.
             </summary>
         </member>
         <member name="P:Microsoft.Bot.Builder.Dialogs.ResumptionCookie.Locale">
@@ -593,22 +873,20 @@
             The locale of message.
             </summary>
         </member>
-        <member name="M:Microsoft.Bot.Builder.Dialogs.ResumptionCookie.#ctor(System.String,System.String,System.String,System.String,System.String,System.String)">
+        <member name="M:Microsoft.Bot.Builder.Dialogs.ResumptionCookie.#ctor(Microsoft.Bot.Builder.Dialogs.Address,System.String,System.Boolean,System.String)">
             <summary>
             Creates an instance of the resumption cookie. 
             </summary>
-            <param name="userId"> The user Id.</param>
-            <param name="botId"> The bot Id.</param>
-            <param name="conversationId"> The conversation Id.</param>
-            <param name="channelId"> The channel Id of the conversation.</param>
-            <param name="serviceUrl"> The service url of the conversation.</param>
-            <param name="locale"> The locale of the message.</param>
+            <param name="address">The address.</param>
+            <param name="userName">The user name.</param>
+            <param name="isGroup">The IsGroup flag for conversation.</param>
+            <param name="locale">The locale of the message.</param>
         </member>
         <member name="M:Microsoft.Bot.Builder.Dialogs.ResumptionCookie.#ctor(Microsoft.Bot.Connector.IMessageActivity)">
             <summary>
             Creates an instance of resumption cookie form a <see cref="T:Microsoft.Bot.Connector.IMessageActivity"/>
             </summary>
-            <param name="msg"> The message.</param>
+            <param name="msg">The message.</param>
         </member>
         <member name="M:Microsoft.Bot.Builder.Dialogs.ResumptionCookie.GetMessage">
             <summary>
@@ -667,7 +945,19 @@
             <param name="stack">The dialog stack.</param>
             <param name="resume">The method to resume when the message has been received.</param>
         </member>
-        <member name="M:Microsoft.Bot.Builder.Dialogs.Extensions.AddHeroCard``1(Microsoft.Bot.Connector.IMessageActivity,System.String,System.Collections.Generic.IEnumerable{``0})">
+        <member name="M:Microsoft.Bot.Builder.Dialogs.Extensions.Forward``1(Microsoft.Bot.Builder.Dialogs.Internals.IDialogStack,Microsoft.Bot.Builder.Dialogs.IDialog{``0},Microsoft.Bot.Builder.Dialogs.ResumeAfter{``0},Microsoft.Bot.Connector.IMessageActivity,System.Threading.CancellationToken)">
+            <summary>
+            Call a child dialog, add it to the top of the stack and post the message to the child dialog.
+            </summary>
+            <typeparam name="R">The type of result expected from the child dialog.</typeparam>
+            <param name="stack">The dialog stack.</param>
+            <param name="child">The child dialog.</param>
+            <param name="resume">The method to resume when the child dialog has completed.</param>
+            <param name="message">The message that will be posted to child dialog.</param>
+            <param name="token">A cancellation token.</param>
+            <returns>A task representing the Forward operation.</returns>
+        </member>
+        <member name="M:Microsoft.Bot.Builder.Dialogs.Extensions.AddHeroCard``1(Microsoft.Bot.Connector.IMessageActivity,System.String,System.Collections.Generic.IEnumerable{``0},System.Collections.Generic.IEnumerable{System.String})">
             <summary>
             Generates buttons from options and add them to the message.
             </summary>
@@ -678,6 +968,20 @@
             <param name="message"> The message that the buttons will be added to.</param>
             <param name="text"> The text in the <see cref="T:Microsoft.Bot.Connector.HeroCard"/>.</param>
             <param name="options"> The options that cause generation of buttons.</param>
+            <param name="descriptions">Descriptions for each option.</param>
+        </member>
+        <member name="M:Microsoft.Bot.Builder.Dialogs.Extensions.AddKeyboardCard``1(Microsoft.Bot.Connector.IMessageActivity,System.String,System.Collections.Generic.IEnumerable{``0},System.Collections.Generic.IEnumerable{System.String})">
+            <summary>
+            Generates buttons from options and add them to the message.
+            </summary>
+            <remarks>
+            <typeparamref name="T"/> should implement ToString().
+            </remarks>
+            <typeparam name="T"> Type of the options.</typeparam>
+            <param name="message"> The message that the buttons will be added to.</param>
+            <param name="text"> The text in the <see cref="T:Microsoft.Bot.Connector.HeroCard"/>.</param>
+            <param name="options"> The options that cause generation of buttons.</param>
+            <param name="descriptions">Descriptions for each option.</param>
         </member>
         <member name="T:Microsoft.Bot.Builder.Dialogs.IBotDataBag">
             <summary>
@@ -688,6 +992,12 @@
             <summary>
             Gets the number of key/value pairs contained in the <see cref="T:Microsoft.Bot.Builder.Dialogs.IBotDataBag"/>.
             </summary>
+        </member>
+        <member name="M:Microsoft.Bot.Builder.Dialogs.IBotDataBag.ContainsKey(System.String)">
+            <summary>
+            Checks if data bag contains a value with specified key
+            </summary>
+            <param name="key">The key.</param>
         </member>
         <member name="M:Microsoft.Bot.Builder.Dialogs.IBotDataBag.TryGetValue``1(System.String,``0@)">
             <summary>
@@ -768,6 +1078,15 @@
             <param name="luisResult">The LUIS result.</param>
             <returns>A task representing the completion of the intent processing.</returns>
         </member>
+        <member name="T:Microsoft.Bot.Builder.Dialogs.IntentActivityHandler">
+            <summary>
+            The handler for a LUIS intent.
+            </summary>
+            <param name="context">The dialog context.</param>
+            <param name="message">The dialog message.</param>
+            <param name="luisResult">The LUIS result.</param>
+            <returns>A task representing the completion of the intent processing.</returns>
+        </member>
         <member name="T:Microsoft.Bot.Builder.Dialogs.InvalidIntentHandlerException">
             <summary>
             An exception for invalid intent handlers.
@@ -775,13 +1094,15 @@
         </member>
         <member name="T:Microsoft.Bot.Builder.Dialogs.LuisServiceResult">
             <summary>
-            Matches a LuisResult object with the best scored IntentRecommendation of the LuisResult.
+            Matches a LuisResult object with the best scored IntentRecommendation of the LuisResult 
+            and corresponding Luis service.
             </summary>
         </member>
         <member name="T:Microsoft.Bot.Builder.Dialogs.LuisDialog`1">
             <summary>
             A dialog specialized to handle intents and entities from LUIS.
             </summary>
+            <typeparam name="TResult">The result type.</typeparam>
         </member>
         <member name="F:Microsoft.Bot.Builder.Dialogs.LuisDialog`1.handlerByIntent">
             <summary>   Mapping from intent string to the appropriate handler. </summary>
@@ -799,13 +1120,27 @@
             <param name="result">A result of a LUIS service call.</param>
             <returns>The best scored <see cref="T:Microsoft.Bot.Builder.Luis.Models.IntentRecommendation" />, or null if <paramref name="result" /> doesn't contain any intents.</returns>
         </member>
-        <member name="M:Microsoft.Bot.Builder.Dialogs.LuisDialog`1.BestResultFrom(System.Collections.Generic.IEnumerable{Microsoft.Bot.Builder.Luis.Models.LuisResult})">
+        <member name="M:Microsoft.Bot.Builder.Dialogs.LuisDialog`1.BestResultFrom(System.Collections.Generic.IEnumerable{Microsoft.Bot.Builder.Dialogs.LuisServiceResult})">
             <summary>
-            Calculates the best scored <see cref="T:Microsoft.Bot.Builder.Luis.Models.IntentRecommendation" /> across some <see cref="T:Microsoft.Bot.Builder.Luis.Models.LuisResult" /> objects.
+            Calculates the best scored <see cref="T:Microsoft.Bot.Builder.Dialogs.LuisServiceResult" /> across multiple <see cref="T:Microsoft.Bot.Builder.Dialogs.LuisServiceResult" /> returned by
+            different <see cref="T:Microsoft.Bot.Builder.Luis.ILuisService"/>.
             </summary>
             <param name="results">Results of multiple LUIS services calls.</param>
             <returns>A <see cref="T:Microsoft.Bot.Builder.Dialogs.LuisServiceResult" /> with the best scored <see cref="T:Microsoft.Bot.Builder.Luis.Models.IntentRecommendation" /> and related <see cref="T:Microsoft.Bot.Builder.Luis.Models.LuisResult" />,
             or null if no one of <paramref name="results" /> contains any intents.</returns>
+        </member>
+        <member name="T:Microsoft.Bot.Builder.Dialogs.LuisActionDialog">
+            <summary>
+            The dialog wrapping Luis dialog feature.
+            </summary>
+        </member>
+        <member name="M:Microsoft.Bot.Builder.Dialogs.LuisActionDialog.#ctor(Microsoft.Bot.Builder.Luis.ILuisService,System.String,System.String)">
+            <summary>
+            Creates an instance of LuisActionDialog.
+            </summary>
+            <param name="luisService"> The Luis service.</param>
+            <param name="contextId"> The contextId for Luis dialog returned in Luis result.</param>
+            <param name="prompt"> The prompt that should be asked from user.</param>
         </member>
         <member name="M:Microsoft.Bot.Builder.Dialogs.LuisDialog.EnumerateHandlers(System.Object)">
             <summary>
@@ -842,14 +1177,14 @@
         </member>
         <member name="T:Microsoft.Bot.Builder.Dialogs.IDialog`1">
             <summary>
-            A <see cref="T:Microsoft.Bot.Builder.Dialogs.IDialog`1"/> is a suspendable conversational process that produces a result of type <typeparamref name="T"/>.
+            A <see cref="T:Microsoft.Bot.Builder.Dialogs.IDialog`1"/> is a suspendable conversational process that produces a result of type <typeparamref name="TResult"/>.
             </summary>
             <remarks>
             Dialogs can call child dialogs or send messages to a user.
             Dialogs are suspended when waiting for a message from the user to the bot.
             Dialogs are resumed when the bot receives a message from the user.
             </remarks>
-            <typeparam name="T">The result type.</typeparam>
+            <typeparam name="TResult">The result type.</typeparam>
         </member>
         <member name="M:Microsoft.Bot.Builder.Dialogs.IDialog`1.StartAsync(Microsoft.Bot.Builder.Dialogs.IDialogContext)">
             <summary>
@@ -887,6 +1222,15 @@
             The context for the bot.
             </summary>
         </member>
+        <member name="P:Microsoft.Bot.Builder.Dialogs.IBotContext.Activity">
+            <summary>
+            The activity posted to bot.
+            </summary>
+            <remarks> This is the incoming activity in reactive cases.
+            for proactive case, i.e. Conversation.ResumeAsync code path,
+            it will be the <see cref="T:Microsoft.Bot.Connector.IMessageActivity"/> returned by <see cref="M:Microsoft.Bot.Connector.ConversationReference.GetPostToBotMessage"/>.
+            </remarks>
+        </member>
         <member name="T:Microsoft.Bot.Builder.Dialogs.IDialogContext">
             <summary>
             The context for the execution of a dialog's conversational process.
@@ -901,6 +1245,16 @@
             <summary>
             Generate buttons for choices and let connector generate the right style based on channel capabilities
             </summary>
+        </member>
+        <member name="F:Microsoft.Bot.Builder.Dialogs.PromptStyle.Keyboard">
+            <summary>
+            Generate keyboard card for choices that will be mapped to a 
+            <see cref="T:Microsoft.Bot.Connector.HeroCard"/> or a keyboard, e.g. Facebook quick replies
+            </summary>
+            <remarks>
+            Make sure to use <see cref="T:Microsoft.Bot.Builder.Dialogs.Internals.MapToChannelData_BotToUser"/> with <see cref="T:Microsoft.Bot.Builder.Dialogs.Internals.KeyboardCardMapper"/>
+            when you use this option
+            </remarks>
         </member>
         <member name="F:Microsoft.Bot.Builder.Dialogs.PromptStyle.AutoText">
             <summary>
@@ -941,8 +1295,17 @@
         </member>
         <member name="F:Microsoft.Bot.Builder.Dialogs.PromptOptions`1.Options">
             <summary>
-            The prompt choices.
+            The choices to be returned when selected.
             </summary>
+        </member>
+        <member name="F:Microsoft.Bot.Builder.Dialogs.PromptOptions`1.Descriptions">
+            <summary>
+            The description of each possible option.
+            </summary>
+            <remarks>
+            If this is null, then the descriptions will be the options converted to strings.
+            Otherwise this should have the same number of values as Options and it contains the string to describe the value being selected.
+            </remarks>
         </member>
         <member name="F:Microsoft.Bot.Builder.Dialogs.PromptOptions`1.TooManyAttempts">
             <summary>
@@ -969,16 +1332,17 @@
             Default <see cref="F:Microsoft.Bot.Builder.Dialogs.PromptOptions`1.TooManyAttempts"/> string that is used if <see cref="F:Microsoft.Bot.Builder.Dialogs.PromptOptions`1.TooManyAttempts"/> is null.
             </summary>
         </member>
-        <member name="M:Microsoft.Bot.Builder.Dialogs.PromptOptions`1.#ctor(System.String,System.String,System.String,System.Collections.Generic.IList{`0},System.Int32,Microsoft.Bot.Builder.Dialogs.PromptStyler)">
+        <member name="M:Microsoft.Bot.Builder.Dialogs.PromptOptions`1.#ctor(System.String,System.String,System.String,System.Collections.Generic.IReadOnlyList{`0},System.Int32,Microsoft.Bot.Builder.Dialogs.PromptStyler,System.Collections.Generic.IReadOnlyList{System.String})">
             <summary>
             Constructs the prompt options.
             </summary>
             <param name="prompt"> The prompt.</param>
             <param name="retry"> What to display on retry.</param>
             <param name="tooManyAttempts"> What to display when user didn't say a valid response after <see cref="P:Microsoft.Bot.Builder.Dialogs.PromptOptions`1.Attempts"/>.</param>
-            <param name="options"> The prompt choices.</param>
+            <param name="options"> The prompt choice values.</param>
             <param name="attempts"> Maximum number of attempts.</param>
             <param name="promptStyler"> The prompt styler.</param>
+            <param name="descriptions">Descriptions for each prompt.</param>
         </member>
         <member name="T:Microsoft.Bot.Builder.Dialogs.PromptStyler">
             <summary>
@@ -990,7 +1354,7 @@
             Style of the prompt <see cref="T:Microsoft.Bot.Builder.Dialogs.PromptStyle"/>.
             </summary>
         </member>
-        <member name="M:Microsoft.Bot.Builder.Dialogs.PromptStyler.Apply``1(Microsoft.Bot.Connector.IMessageActivity@,System.String,System.Collections.Generic.IList{``0},Microsoft.Bot.Builder.Dialogs.PromptStyle)">
+        <member name="M:Microsoft.Bot.Builder.Dialogs.PromptStyler.Apply``1(Microsoft.Bot.Connector.IMessageActivity@,System.String,System.Collections.Generic.IReadOnlyList{``0},Microsoft.Bot.Builder.Dialogs.PromptStyle,System.Collections.Generic.IReadOnlyList{System.String})">
             <summary>
             <see cref="M:Microsoft.Bot.Builder.Dialogs.PromptStyler.Apply(Microsoft.Bot.Connector.IMessageActivity@,System.String)"/>.
             </summary>
@@ -999,6 +1363,7 @@
             <param name="prompt"> The prompt.</param>
             <param name="options"> The options.</param>
             <param name="promptStyle"> The prompt style.</param>
+            <param name="descriptions">Descriptions for each option.</param>
         </member>
         <member name="M:Microsoft.Bot.Builder.Dialogs.PromptStyler.Apply(Microsoft.Bot.Connector.IMessageActivity@,System.String)">
             <summary>
@@ -1007,7 +1372,7 @@
             <param name="message"> The message that will contain the prompt.</param>
             <param name="prompt"> The prompt.</param>
         </member>
-        <member name="M:Microsoft.Bot.Builder.Dialogs.PromptStyler.Apply``1(Microsoft.Bot.Connector.IMessageActivity@,System.String,System.Collections.Generic.IList{``0})">
+        <member name="M:Microsoft.Bot.Builder.Dialogs.PromptStyler.Apply``1(Microsoft.Bot.Connector.IMessageActivity@,System.String,System.Collections.Generic.IReadOnlyList{``0},System.Collections.Generic.IReadOnlyList{System.String})">
             <summary>
             Style a prompt and populate the message based on <see cref="F:Microsoft.Bot.Builder.Dialogs.PromptStyler.PromptStyle"/>.
             </summary>
@@ -1015,8 +1380,9 @@
             <param name="message"> The message that will contain the prompt.</param>
             <param name="prompt"> The prompt.</param>
             <param name="options"> The options.</param>
+            <param name="descriptions">Descriptions to display for each option.</param>
             <remarks>
-            <typeparamref name="T"/> should implement <see cref="M:System.Object.ToString"/>.
+            <typeparamref name="T"/> should implement <see cref="M:System.Object.ToString"/> unless descriptions are supplied.
             </remarks>
         </member>
         <member name="T:Microsoft.Bot.Builder.Dialogs.PromptDialog">
@@ -1064,7 +1430,7 @@
             <param name="retry">    What to show on retry. </param>
             <param name="attempts"> The number of times to retry. </param>
         </member>
-        <member name="M:Microsoft.Bot.Builder.Dialogs.PromptDialog.Choice``1(Microsoft.Bot.Builder.Dialogs.IDialogContext,Microsoft.Bot.Builder.Dialogs.ResumeAfter{``0},System.Collections.Generic.IEnumerable{``0},System.String,System.String,System.Int32,Microsoft.Bot.Builder.Dialogs.PromptStyle)">
+        <member name="M:Microsoft.Bot.Builder.Dialogs.PromptDialog.Choice``1(Microsoft.Bot.Builder.Dialogs.IDialogContext,Microsoft.Bot.Builder.Dialogs.ResumeAfter{``0},System.Collections.Generic.IEnumerable{``0},System.String,System.String,System.Int32,Microsoft.Bot.Builder.Dialogs.PromptStyle,System.Collections.Generic.IEnumerable{System.String})">
             <summary>   Prompt for one of a set of choices. </summary>
             <param name="context">  The context. </param>
             <param name="resume">   Resume handler. </param>
@@ -1073,6 +1439,7 @@
             <param name="retry">    What to show on retry. </param>
             <param name="attempts"> The number of times to retry. </param>
             <param name="promptStyle"> Style of the prompt <see cref="T:Microsoft.Bot.Builder.Dialogs.PromptStyle" /> </param>
+            <param name="descriptions">Descriptions to display for choices.</param>
         </member>
         <member name="M:Microsoft.Bot.Builder.Dialogs.PromptDialog.Choice``1(Microsoft.Bot.Builder.Dialogs.IDialogContext,Microsoft.Bot.Builder.Dialogs.ResumeAfter{``0},Microsoft.Bot.Builder.Dialogs.PromptOptions{``0})">
             <summary>
@@ -1105,13 +1472,32 @@
             <param name="retry">    What to display on retry. </param>
             <param name="attempts"> Maximum number of attempts. </param>
         </member>
+        <member name="M:Microsoft.Bot.Builder.Dialogs.PromptDialog.PromptString.#ctor(Microsoft.Bot.Builder.Dialogs.PromptOptions{System.String})">
+            <summary>   Constructor for a prompt string dialog. </summary>
+            <param name="promptOptions"> THe prompt options.</param>
+        </member>
         <member name="T:Microsoft.Bot.Builder.Dialogs.PromptDialog.PromptConfirm">
             <summary>   Prompt for a confirmation. </summary>
             <remarks>   Normally used through <see cref="M:Microsoft.Bot.Builder.Dialogs.PromptDialog.Confirm(Microsoft.Bot.Builder.Dialogs.IDialogContext,Microsoft.Bot.Builder.Dialogs.ResumeAfter{System.Boolean},System.String,System.String,System.Int32,Microsoft.Bot.Builder.Dialogs.PromptStyle)"/>.</remarks>
         </member>
+        <member name="F:Microsoft.Bot.Builder.Dialogs.PromptDialog.PromptConfirm.Yes">
+            <summary>
+            Index of yes descriptions.
+            </summary>
+        </member>
+        <member name="F:Microsoft.Bot.Builder.Dialogs.PromptDialog.PromptConfirm.No">
+            <summary>
+            Index of no descriptions.
+            </summary>
+        </member>
         <member name="P:Microsoft.Bot.Builder.Dialogs.PromptDialog.PromptConfirm.Options">
             <summary>
             The yes, no options for confirmation prompt
+            </summary>
+        </member>
+        <member name="P:Microsoft.Bot.Builder.Dialogs.PromptDialog.PromptConfirm.Patterns">
+            <summary>
+            The patterns for matching yes/no responses in the confirmation prompt.
             </summary>
         </member>
         <member name="M:Microsoft.Bot.Builder.Dialogs.PromptDialog.PromptConfirm.#ctor(System.String,System.String,System.Int32,Microsoft.Bot.Builder.Dialogs.PromptStyle)">
@@ -1137,6 +1523,10 @@
             <param name="retry">    What to display on retry. </param>
             <param name="attempts"> Maximum number of attempts. </param>
         </member>
+        <member name="M:Microsoft.Bot.Builder.Dialogs.PromptDialog.PromptInt64.#ctor(Microsoft.Bot.Builder.Dialogs.PromptOptions{System.Int64})">
+            <summary>   Constructor for a prompt int64 dialog. </summary>
+            <param name="promptOptions"> THe prompt options.</param>
+        </member>
         <member name="T:Microsoft.Bot.Builder.Dialogs.PromptDialog.PromptDouble">
             <summary>   Prompt for a double. </summary>
             <remarks>   Normally used through <see cref="M:Microsoft.Bot.Builder.Dialogs.PromptDialog.Number(Microsoft.Bot.Builder.Dialogs.IDialogContext,Microsoft.Bot.Builder.Dialogs.ResumeAfter{System.Double},System.String,System.String,System.Int32)"/>.</remarks>
@@ -1147,17 +1537,22 @@
             <param name="retry">    What to display on retry. </param>
             <param name="attempts"> Maximum number of attempts. </param>
         </member>
+        <member name="M:Microsoft.Bot.Builder.Dialogs.PromptDialog.PromptDouble.#ctor(Microsoft.Bot.Builder.Dialogs.PromptOptions{System.Double})">
+            <summary>   Constructor for a prompt double dialog. </summary>
+            <param name="promptOptions"> THe prompt options.</param>
+        </member>
         <member name="T:Microsoft.Bot.Builder.Dialogs.PromptDialog.PromptChoice`1">
             <summary>   Prompt for a choice from a set of choices. </summary>
-            <remarks>   Normally used through <see cref="M:Microsoft.Bot.Builder.Dialogs.PromptDialog.Choice``1(Microsoft.Bot.Builder.Dialogs.IDialogContext,Microsoft.Bot.Builder.Dialogs.ResumeAfter{``0},System.Collections.Generic.IEnumerable{``0},System.String,System.String,System.Int32,Microsoft.Bot.Builder.Dialogs.PromptStyle)"/>.</remarks>
+            <remarks>   Normally used through <see cref="M:Microsoft.Bot.Builder.Dialogs.PromptDialog.Choice``1(Microsoft.Bot.Builder.Dialogs.IDialogContext,Microsoft.Bot.Builder.Dialogs.ResumeAfter{``0},System.Collections.Generic.IEnumerable{``0},System.String,System.String,System.Int32,Microsoft.Bot.Builder.Dialogs.PromptStyle,System.Collections.Generic.IEnumerable{System.String})"/>.</remarks>
         </member>
-        <member name="M:Microsoft.Bot.Builder.Dialogs.PromptDialog.PromptChoice`1.#ctor(System.Collections.Generic.IEnumerable{`0},System.String,System.String,System.Int32,Microsoft.Bot.Builder.Dialogs.PromptStyle)">
+        <member name="M:Microsoft.Bot.Builder.Dialogs.PromptDialog.PromptChoice`1.#ctor(System.Collections.Generic.IEnumerable{`0},System.String,System.String,System.Int32,Microsoft.Bot.Builder.Dialogs.PromptStyle,System.Collections.Generic.IEnumerable{System.String})">
             <summary>   Constructor for a prompt choice dialog. </summary>
             <param name="options">Enumerable of the options to choose from.</param>
             <param name="prompt">   The prompt. </param>
             <param name="retry">    What to display on retry. </param>
             <param name="attempts"> Maximum number of attempts. </param>
             <param name="promptStyle"> Style of the prompt <see cref="T:Microsoft.Bot.Builder.Dialogs.PromptStyle" /> </param>
+            <param name="descriptions">Descriptions to show for each option.</param>
         </member>
         <member name="M:Microsoft.Bot.Builder.Dialogs.PromptDialog.PromptChoice`1.#ctor(Microsoft.Bot.Builder.Dialogs.PromptOptions{`0})">
             <summary>
@@ -1188,22 +1583,73 @@
             </summary>
             <returns>The awaiter.</returns>
         </member>
-        <member name="T:Microsoft.Bot.Builder.Internals.Fibers.FiberModule">
+        <member name="T:Microsoft.Bot.Builder.Dialogs.AwaitableFromItem`1">
             <summary>
-            Autofac module for Fiber components.
+            Creates a <see cref="T:Microsoft.Bot.Builder.Dialogs.IAwaitable`1"/> from item passed to constructor.
+            </summary>
+            <typeparam name="T"> The type of the item.</typeparam>
+        </member>
+        <member name="M:Microsoft.Bot.Builder.Dialogs.Awaitable.FromItem``1(``0)">
+            <summary>
+            Wraps item in a <see cref="T:Microsoft.Bot.Builder.Dialogs.IAwaitable`1"/>.
+            </summary>
+            <typeparam name="T">Type of the item.</typeparam>
+            <param name="item">The item that will be wrapped.</param>
+        </member>
+        <member name="M:Microsoft.Bot.Builder.Internals.Fibers.Extensions.Wait``2(Microsoft.Bot.Builder.Internals.Fibers.IFiber{``0},Microsoft.Bot.Builder.Internals.Fibers.Rest{``0,``1})">
+            <summary>
+            Without pushing or popping the stack, schedule a wait to be satisfied later.
             </summary>
         </member>
-        <member name="M:Microsoft.Bot.Builder.Internals.Fibers.FiberModule.DoNotSerialize(Autofac.IComponentContext,System.Collections.Generic.IEnumerable{Autofac.Core.Parameter})">
+        <member name="M:Microsoft.Bot.Builder.Internals.Fibers.Extensions.Call``3(Microsoft.Bot.Builder.Internals.Fibers.IFiber{``0},Microsoft.Bot.Builder.Internals.Fibers.Rest{``0,``1},``1,Microsoft.Bot.Builder.Internals.Fibers.Rest{``0,``2})">
             <summary>
-            Eagerly enumerate the services keyed with <see cref="F:Microsoft.Bot.Builder.Internals.Fibers.FiberModule.Key_DoNotSerialize"/> that will not be serialized.
+            Scheduled a wait for the return value, then invoke the <see cref="M:Microsoft.Bot.Builder.Internals.Fibers.Extensions.Call``2(Microsoft.Bot.Builder.Internals.Fibers.IFiber{``0},Microsoft.Bot.Builder.Internals.Fibers.Rest{``0,``1},``1)"/> method.
+            </summary>
+        </member>
+        <member name="M:Microsoft.Bot.Builder.Internals.Fibers.Extensions.Call``2(Microsoft.Bot.Builder.Internals.Fibers.IFiber{``0},Microsoft.Bot.Builder.Internals.Fibers.Rest{``0,``1},``1)">
+            <summary>
+            Push a frame on the stack, schedule a wait, and immediately satisfy that wait.
             </summary>
             <remarks>
-            Services marked with <see cref="F:Microsoft.Bot.Builder.Internals.Fibers.FiberModule.Key_DoNotSerialize"/> will not serialize their dependencies either.
+            This overload is used to allow a child to later call <see cref="M:Microsoft.Bot.Builder.Internals.Fibers.Extensions.Done``2(Microsoft.Bot.Builder.Internals.Fibers.IFiber{``0},``1)"/>
+            to satisfy an existing wait without scheduling a new wait for the child's return value.
             </remarks>
         </member>
-        <member name="T:Microsoft.Bot.Builder.Internals.Fibers.FiberModule`1">
+        <member name="M:Microsoft.Bot.Builder.Internals.Fibers.Extensions.Done``2(Microsoft.Bot.Builder.Internals.Fibers.IFiber{``0},``1)">
             <summary>
-            Autofac module for Fiber components.
+            Remove the frame from the stack, and satisfy the existing wait with the return value.
+            </summary>
+        </member>
+        <member name="T:Microsoft.Bot.Builder.Internals.Fibers.IScope`1">
+            <summary>
+            Provide an abstraction to serialize access to an item for a using-block scope of code.
+            </summary>
+            <typeparam name="T">The item type.</typeparam>
+        </member>
+        <member name="M:Microsoft.Bot.Builder.Internals.Fibers.IScope`1.WithScopeAsync(`0,System.Threading.CancellationToken)">
+            <summary>
+            Enter a scope of code keyed by item.
+            </summary>
+            <param name="item">The item.</param>
+            <param name="token">The cancellation token.</param>
+            <returns>A task whose completion produces an IDisposable for the scope.</returns>
+        </member>
+        <member name="T:Microsoft.Bot.Builder.Internals.Fibers.IWaiter`1">
+            <summary>
+            Waiters wait for an item to be posted.
+            </summary>
+            <remarks>
+            Fibers and fiber frames are both waiters.
+            </remarks>
+        </member>
+        <member name="P:Microsoft.Bot.Builder.Internals.Fibers.IWaiter`1.Mark">
+            <summary>
+            A "mailbox" for storing a wait associated with this frame.
+            </summary>
+        </member>
+        <member name="P:Microsoft.Bot.Builder.Internals.Fibers.IWaiter`1.Wait">
+            <summary>
+            The active wait for this waiter.
             </summary>
         </member>
         <member name="T:Microsoft.Bot.Builder.Internals.Fibers.Serialization.ISurrogateProvider">
@@ -1220,9 +1666,546 @@
             <param name="priority">The priority of this provider.</param>
             <returns>True if this provider handles this type, false otherwise.</returns>
         </member>
+        <member name="T:Microsoft.Bot.Builder.Internals.Fibers.Need">
+            <summary>
+            This is the stage of the wait, showing what the wait needs during its lifecycle.
+            </summary>
+        </member>
+        <member name="F:Microsoft.Bot.Builder.Internals.Fibers.Need.None">
+            <summary>
+            The wait does not need anything.
+            </summary>
+        </member>
+        <member name="F:Microsoft.Bot.Builder.Internals.Fibers.Need.Wait">
+            <summary>
+            The wait needs an item to be posted.
+            </summary>
+        </member>
+        <member name="F:Microsoft.Bot.Builder.Internals.Fibers.Need.Poll">
+            <summary>
+            The wait needs to be polled for execution after an item has been posted.
+            </summary>
+        </member>
+        <member name="F:Microsoft.Bot.Builder.Internals.Fibers.Need.Call">
+            <summary>
+            The wait is in the middle of executing the rest delegate.
+            </summary>
+        </member>
+        <member name="F:Microsoft.Bot.Builder.Internals.Fibers.Need.Done">
+            <summary>
+            The wait has completed executing the rest delegate.
+            </summary>
+        </member>
+        <member name="P:Microsoft.Bot.Builder.Internals.Fibers.IWait.Need">
+            <summary>
+            The stage of the wait.
+            </summary>
+        </member>
+        <member name="P:Microsoft.Bot.Builder.Internals.Fibers.IWait.ItemType">
+            <summary>
+            The type of the item parameter for the rest delegate.
+            </summary>
+        </member>
+        <member name="P:Microsoft.Bot.Builder.Internals.Fibers.IWait.NeedType">
+            <summary>
+            The static type of the wait item.
+            </summary>
+        </member>
+        <member name="P:Microsoft.Bot.Builder.Internals.Fibers.IWait.Rest">
+            <summary>
+            The rest delegate method.
+            </summary>
+        </member>
+        <member name="M:Microsoft.Bot.Builder.Internals.Fibers.IWait.Post``1(``0)">
+            <summary>
+            Mark this wait as satisfied with this item.
+            </summary>
+        </member>
+        <member name="M:Microsoft.Bot.Builder.Internals.Fibers.IWait.Fail(System.Exception)">
+            <summary>
+            Mark this wait as satisfied with this fail exception.
+            </summary>
+        </member>
+        <member name="T:Microsoft.Bot.Builder.Internals.Fibers.NullWait`1">
+            <summary>
+            Null object pattern implementation of wait interface.
+            </summary>
+        </member>
+        <member name="T:Microsoft.Bot.Builder.Scorables.Internals.IResolver">
+            <summary>
+            Allow the resolution of values based on type and optionally tag.
+            </summary>
+            <remarks>
+            The tag should be restrictive to services registered with that tag.
+            </remarks>
+        </member>
+        <member name="T:Microsoft.Bot.Builder.Scorables.Internals.InheritedAttributes">
+            <summary>
+            Helper methods to enumerate inherited attributes for a method.
+            </summary>
+            <remarks>
+            http://bradwilson.typepad.com/blog/2011/08/interface-attributes-class-attributes.html
+            </remarks>
+        </member>
+        <member name="T:Microsoft.Bot.Builder.Scorables.Internals.IBinding">
+            <summary>
+            Represents a binding of arguments to a method's parameters.
+            </summary>
+        </member>
+        <member name="T:Microsoft.Bot.Builder.Scorables.Internals.IBinding`1">
+            <summary>
+            Represents a binding of arguments to a method's parameter,
+            where the method returns a value of type <typeparamref name="R"/>.
+            </summary>
+            <typeparam name="R">The return value type.</typeparam>
+        </member>
+        <member name="T:Microsoft.Bot.Builder.Scorables.Internals.ScorableBase`3">
+            <summary>
+            Allow for static type checking of opaque state for convenience of scorable implementations.
+            </summary>
+            <remarks>
+            The IScorable methods are marked with DebuggerStepThrough because once the compiler has verified the type
+            safety of the derived class that implements the abstract State-typed methods, these DebuggerStepThrough
+            methods will not throw exceptions due to runtime type errors.
+            </remarks>
+        </member>
+        <member name="T:Microsoft.Bot.Builder.Scorables.Internals.Token`2">
+            <summary>
+            Provides the state to aggregate the state (and associated scorable) of multiple scorables.
+            </summary>
+        </member>
+        <member name="T:Microsoft.Bot.Builder.Scorables.Internals.ScorableAggregator`6">
+            <summary>
+            Aggregates some non-empty set of inner scorables to produce an outer scorable.
+            </summary>
+        </member>
+        <member name="T:Microsoft.Bot.Builder.Scorables.Internals.LuisIntentScorable`2">
+            <summary>
+            Scorable to represent a specific LUIS intent recommendation.
+            </summary>
+        </member>
+        <member name="T:Microsoft.Bot.Builder.Scorables.Internals.MethodScorable">
+            <summary>
+            Scorable to represent binding arguments to a method's parameters.
+            </summary>
+        </member>
+        <member name="T:Microsoft.Bot.Builder.Scorables.Internals.FoldStage">
+            <summary>
+            The stage of the FoldScorable events.
+            </summary>
+        </member>
+        <member name="F:Microsoft.Bot.Builder.Scorables.Internals.FoldStage.AfterFold">
+            <summary>
+            After IScorable.PrepareAsync has been called and the state and score will be folded into the aggregated scorable.
+            </summary>
+        </member>
+        <member name="F:Microsoft.Bot.Builder.Scorables.Internals.FoldStage.StartPost">
+            <summary>
+            Before IScorable.PostAsync has been called to initiate the next best scorable's action.
+            </summary>
+        </member>
+        <member name="F:Microsoft.Bot.Builder.Scorables.Internals.FoldStage.AfterPost">
+            <summary>
+            After IScorable.PostAsync has been called to complete the next best scorable's action.
+            </summary>
+        </member>
+        <member name="T:Microsoft.Bot.Builder.Scorables.Internals.FoldScorable`2">
+            <summary>
+            Fold an aggregation of scorables to produce a winning scorable.
+            </summary>
+            <remarks>
+            Fold aka "reduce, accumulate, aggregate, compress, or inject"
+            https://en.wikipedia.org/wiki/Fold_(higher-order_function)
+            </remarks>
+        </member>
+        <member name="T:Microsoft.Bot.Builder.Scorables.Internals.FoldScorable`2.OnStageDelegate">
+            <summary>
+            Event handler delegate for fold scorable stages.
+            </summary>
+        </member>
+        <member name="P:Microsoft.Bot.Builder.Scorables.Internals.FoldScorable`2.OnStage">
+            <summary>
+            Event handler for fold scorable stages.
+            </summary>
+            <remarks>
+            This is late-bound to allow binding to "this" in derived classes.
+            </remarks>
+        </member>
+        <member name="T:Microsoft.Bot.Builder.Scorables.Internals.FoldScorable`2.State">
+            <summary>
+            Per-scorable opaque state used during scoring process.
+            </summary>
+        </member>
+        <member name="T:Microsoft.Bot.Builder.Scorables.Internals.DelegatingFoldScorable`2">
+            <summary>
+            This scorable delegates the stage event handler to an external delegate or an overridable virtual method.
+            </summary>
+        </member>
+        <member name="T:Microsoft.Bot.Builder.Scorables.Internals.NullComparer`1">
+            <summary>
+            A null comparer that pretends every item is equal.  This is particularly useful with stable sorts.
+            </summary>
+        </member>
+        <member name="T:Microsoft.Bot.Builder.Scorables.Internals.RegexMatchScorable">
+            <summary>
+            Static helper methods for RegexMatchScorable.
+            </summary>
+        </member>
+        <member name="M:Microsoft.Bot.Builder.Scorables.Internals.RegexMatchScorable.ScoreFor(System.Text.RegularExpressions.Match)">
+            <summary>
+            Calculate a normalized 0-1 score for a regular expression match.
+            </summary>
+        </member>
+        <member name="T:Microsoft.Bot.Builder.Scorables.Internals.RegexMatchScorable`2">
+            <summary>
+            Scorable to represent a regular expression match against an activity's text.
+            </summary>
+        </member>
+        <member name="T:Microsoft.Bot.Builder.Scorables.Internals.ActivityResolver">
+            <summary>
+            A resolver to recover C# type information from Activity schema types.
+            </summary>
+        </member>
+        <member name="T:Microsoft.Bot.Builder.Scorables.Actions">
+            <summary>
+            Fluent methods related to <see cref="T:Microsoft.Bot.Builder.Scorables.IScorable`2"/>.
+            </summary>
+        </member>
+        <member name="T:Microsoft.Bot.Builder.Scorables.IScorable`2">
+            <summary>
+            Allow the scoring of items, with external comparison of scores, and enable the winner to take some action.
+            </summary>
+            <remarks>
+            We avoided the traditional "bool TryScore(Item item, object state, out Score score)" pattern to allow for Score generic type parameter covariance.
+            </remarks>
+        </member>
+        <member name="M:Microsoft.Bot.Builder.Scorables.IScorable`2.PrepareAsync(`0,System.Threading.CancellationToken)">
+            <summary>
+            Perform some asynchronous work to analyze the item and produce some opaque state.
+            </summary>
+        </member>
+        <member name="M:Microsoft.Bot.Builder.Scorables.IScorable`2.HasScore(`0,System.Object)">
+            <summary>
+            Returns whether this scorable wants to participate in scoring this item.
+            </summary>
+        </member>
+        <member name="M:Microsoft.Bot.Builder.Scorables.IScorable`2.GetScore(`0,System.Object)">
+            <summary>
+            Gets the score for this item.
+            </summary>
+        </member>
+        <member name="M:Microsoft.Bot.Builder.Scorables.IScorable`2.PostAsync(`0,System.Object,System.Threading.CancellationToken)">
+            <summary>
+            If this scorable wins, this method is called.
+            </summary>
+        </member>
+        <member name="M:Microsoft.Bot.Builder.Scorables.IScorable`2.DoneAsync(`0,System.Object,System.Threading.CancellationToken)">
+            <summary>
+            The scoring process has completed - dispose of any scoped resources.
+            </summary>
+        </member>
+        <member name="T:Microsoft.Bot.Builder.Scorables.ScorableGroupAttribute">
+            <summary>
+            This attribute is used to control scorable groups for <see cref="T:Microsoft.Bot.Builder.Dialogs.DispatchDialog`1"/>.  
+            </summary>
+            <remarks>
+            <see cref="T:Microsoft.Bot.Builder.Scorables.ScorableGroupAttribute"/> allows the user to override the scoring process to create
+            ordered scorable groups, where the scores from the first scorable group
+            are compared first, and if there is no scorable that wishes to participate
+            from the first scorable group, then the second scorable group is considered, and so forth.
+            </remarks>
+        </member>
+        <member name="P:Microsoft.Bot.Builder.Scorables.ScorableGroupAttribute.Order">
+            <summary>
+            The scorable group order.
+            </summary>
+        </member>
+        <member name="M:Microsoft.Bot.Builder.Scorables.ScorableGroupAttribute.#ctor(System.Int32)">
+            <summary>
+            Construct the <see cref="T:Microsoft.Bot.Builder.Scorables.ScorableGroupAttribute"/>. 
+            </summary>
+            <param name="order">The scorable group order.</param>
+        </member>
+        <member name="T:Microsoft.Bot.Builder.Scorables.MethodBindAttribute">
+            <summary>
+            This attribute is used to specify that a method will participate in the
+            scoring process for overload resolution.
+            </summary>
+        </member>
+        <member name="T:Microsoft.Bot.Builder.Scorables.EntityAttribute">
+            <summary>
+            This attribute is used to specify that a method parameter is bound to an entity
+            that can be resolved by an implementation of <see cref="T:Microsoft.Bot.Builder.Scorables.Internals.IResolver"/>. 
+            </summary>
+        </member>
+        <member name="F:Microsoft.Bot.Builder.Scorables.EntityAttribute.Name">
+            <summary>
+            The entity name.
+            </summary>
+        </member>
+        <member name="M:Microsoft.Bot.Builder.Scorables.EntityAttribute.#ctor(System.String)">
+            <summary>
+            Construct the <see cref="T:Microsoft.Bot.Builder.Scorables.EntityAttribute"/>. 
+            </summary>
+            <param name="name">The entity name.</param>
+        </member>
+        <member name="T:Microsoft.Bot.Builder.Scorables.RegexPatternAttribute">
+            <summary>
+            This attribute is used to specify the regular expression pattern to be used 
+            when applying the regular expression scorable.
+            </summary>
+        </member>
+        <member name="F:Microsoft.Bot.Builder.Scorables.RegexPatternAttribute.Pattern">
+            <summary>
+            The regular expression pattern.
+            </summary>
+        </member>
+        <member name="M:Microsoft.Bot.Builder.Scorables.RegexPatternAttribute.#ctor(System.String)">
+            <summary>
+            Construct the <see cref="T:Microsoft.Bot.Builder.Scorables.RegexPatternAttribute"/>. 
+            </summary>
+            <param name="pattern">The regular expression pattern.</param>
+        </member>
+        <member name="M:Microsoft.Bot.Builder.Scorables.Scorable.TryPostAsync``2(Microsoft.Bot.Builder.Scorables.IScorable{``0,``1},``0,System.Threading.CancellationToken)">
+            <summary>
+            Invoke the scorable calling protocol against a single scorable.
+            </summary>
+        </member>
+        <member name="M:Microsoft.Bot.Builder.Scorables.Scorable.SelectScore``3(Microsoft.Bot.Builder.Scorables.IScorable{``0,``1},System.Func{``0,``1,``2})">
+            <summary>
+            Project the score of a scorable using a lambda expression.
+            </summary>
+        </member>
+        <member name="M:Microsoft.Bot.Builder.Scorables.Scorable.SelectItem``3(Microsoft.Bot.Builder.Scorables.IScorable{``1,``2},System.Func{``0,``1})">
+            <summary>
+            Project the item of a scorable using a lambda expression.
+            </summary>
+        </member>
+        <member name="M:Microsoft.Bot.Builder.Scorables.Scorable.Keep``2(Microsoft.Bot.Builder.Scorables.IScorable{``0,``1})">
+            <summary>
+            True if the scorable is non-null, false otherwise.
+            </summary>
+        </member>
+        <member name="M:Microsoft.Bot.Builder.Scorables.Scorable.TryReduce``2(System.Collections.Generic.IEnumerable{Microsoft.Bot.Builder.Scorables.IScorable{``0,``1}}@,Microsoft.Bot.Builder.Scorables.IScorable{``0,``1}@)">
+            <summary>
+            Try to simplify a list of scorables.
+            </summary>
+            <param name="scorables">The simplified list of scorables.</param>
+            <param name="scorable">The single scorable representing the list, if possible.</param>
+            <returns>True if it were possible to reduce the list of scorables to a single scorable, false otherwise.</returns>
+        </member>
+        <member name="M:Microsoft.Bot.Builder.Scorables.Scorable.First``2(System.Collections.Generic.IEnumerable{Microsoft.Bot.Builder.Scorables.IScorable{``0,``1}})">
+            <summary>
+            Select the first scorable that produces a score.
+            </summary>
+        </member>
+        <member name="M:Microsoft.Bot.Builder.Scorables.Scorable.Fold``2(System.Collections.Generic.IEnumerable{Microsoft.Bot.Builder.Scorables.IScorable{``0,``1}},System.Collections.Generic.IComparer{``1},Microsoft.Bot.Builder.Scorables.Internals.FoldScorable{``0,``1}.OnStageDelegate)">
+            <summary>
+            Fold an enumeration of scorables using a score comparer.
+            </summary>
+        </member>
+        <member name="T:Microsoft.Bot.Builder.ConnectorEx.ILocaleFinder">
+            <summary>
+            The interface for finding and setting locale for <see cref="T:Microsoft.Bot.Builder.Base.LocalizedScope"/> in <see cref="T:Microsoft.Bot.Builder.Dialogs.Internals.SetAmbientThreadCulture"/>.
+            </summary>
+        </member>
+        <member name="M:Microsoft.Bot.Builder.ConnectorEx.ILocaleFinder.FindLocale(Microsoft.Bot.Connector.IActivity,System.Threading.CancellationToken)">
+            <summary>
+            Given an activity it finds the locale.
+            </summary>
+            <param name="activity"> The activity.</param>
+            <param name="token">The cancellation token.</param>
+            <returns></returns>
+        </member>
+        <member name="T:Microsoft.Bot.Builder.ConnectorEx.LocaleFinder">
+            <summary>
+            The locale finder implementation based on <see cref="T:Microsoft.Bot.Builder.ConnectorEx.ResumptionContext"/>.
+            </summary>
+        </member>
+        <member name="T:Microsoft.Bot.Builder.ConnectorEx.KeyboardCard">
+            <summary>
+            Card representing a keyboard
+            </summary>
+            <remarks>
+            This will be mapped to <see cref="T:Microsoft.Bot.Connector.HeroCard"/> for all channels 
+            except Facebook. For Facebook, <see cref="T:Microsoft.Bot.Builder.Dialogs.Internals.KeyboardCardMapper"/> maps it 
+            to <see cref="T:Microsoft.Bot.Builder.ConnectorEx.FacebookQuickReply"/>
+            </remarks>
+        </member>
+        <member name="F:Microsoft.Bot.Builder.ConnectorEx.KeyboardCard.ContentType">
+            <summary>
+            Content type of keyboard card for <see cref="P:Microsoft.Bot.Connector.Attachment.ContentType"/>.
+            </summary>
+        </member>
+        <member name="M:Microsoft.Bot.Builder.ConnectorEx.KeyboardCard.#ctor(System.String,System.Collections.Generic.IList{Microsoft.Bot.Connector.CardAction})">
+            <summary>
+            Constructs an instance of the keyboard card.
+            </summary>
+            <param name="text"> The keyboard text.</param>
+            <param name="buttons"> The buttons in keyboard.</param>
+        </member>
+        <member name="P:Microsoft.Bot.Builder.ConnectorEx.KeyboardCard.Text">
+            <summary>
+            The keyboard text. 
+            </summary>
+        </member>
+        <member name="P:Microsoft.Bot.Builder.ConnectorEx.KeyboardCard.Buttons">
+            <summary>
+            The buttons in the keyboard.
+            </summary>
+        </member>
+        <member name="T:Microsoft.Bot.Builder.ConnectorEx.FacebookQuickReply">
+            <summary>
+            Facebook quick reply. See https://developers.facebook.com/docs/messenger-platform/send-api-reference/quick-replies. 
+            </summary>
+        </member>
+        <member name="T:Microsoft.Bot.Builder.ConnectorEx.FacebookMessage">
+            <summary>
+            Facebook message format for quick reply.
+            </summary>
+        </member>
+        <member name="T:Microsoft.Bot.Builder.ConnectorEx.KeyboardCardEx">
+            <summary>
+            Extension methods for <see cref="T:Microsoft.Bot.Builder.ConnectorEx.KeyboardCard"/>
+            </summary>
+        </member>
+        <member name="M:Microsoft.Bot.Builder.ConnectorEx.KeyboardCardEx.ToHeroCard(Microsoft.Bot.Builder.ConnectorEx.KeyboardCard)">
+            <summary>
+            Maps a <see cref="T:Microsoft.Bot.Builder.ConnectorEx.KeyboardCard"/> to a <see cref="T:Microsoft.Bot.Connector.HeroCard"/>
+            </summary>
+            <param name="keyboard"> The keyboard card.</param>
+        </member>
+        <member name="M:Microsoft.Bot.Builder.ConnectorEx.KeyboardCardEx.ToFacebookMessage(Microsoft.Bot.Builder.ConnectorEx.KeyboardCard)">
+            <summary>
+            Maps a <see cref="T:Microsoft.Bot.Builder.ConnectorEx.KeyboardCard"/> to a <see cref="T:Microsoft.Bot.Builder.ConnectorEx.FacebookMessage"/>
+            </summary>
+            <param name="keyboard"> The keyboard card.</param>
+        </member>
+        <member name="T:Microsoft.Bot.Builder.ConnectorEx.ResumptionData">
+            <summary>
+            The data persisted for ConversationReference that will be consumed for Conversation.ResumeAsync. 
+            </summary>
+        </member>
+        <member name="P:Microsoft.Bot.Builder.ConnectorEx.ResumptionData.Locale">
+            <summary>
+            The locale.
+            </summary>
+        </member>
+        <member name="P:Microsoft.Bot.Builder.ConnectorEx.ResumptionData.IsTrustedServiceUrl">
+            <summary>
+            The flag indicating if the ServiceUrl is trusted.
+            </summary>
+        </member>
+        <member name="T:Microsoft.Bot.Builder.ConnectorEx.ResumptionContext">
+            <summary>
+            The resumption context that is responsible for loading/persisting the <see cref="T:Microsoft.Bot.Builder.ConnectorEx.ResumptionData"/>.
+            </summary>
+        </member>
+        <member name="F:Microsoft.Bot.Builder.ConnectorEx.ResumptionContext.RESUMPTION_CONTEXT_KEY">
+            <summary>
+            The key for <see cref="T:Microsoft.Bot.Builder.ConnectorEx.ResumptionData"/> in <see cref="F:Microsoft.Bot.Builder.ConnectorEx.ResumptionContext.botDataBag"/>.
+            </summary>
+        </member>
+        <member name="F:Microsoft.Bot.Builder.ConnectorEx.ResumptionContext.botDataBag">
+            <summary>
+            The <see cref="T:Microsoft.Bot.Builder.Dialogs.IBotDataBag"/> used to store the data.
+            </summary>
+        </member>
+        <member name="M:Microsoft.Bot.Builder.ConnectorEx.ResumptionContext.LoadDataAsync(System.Threading.CancellationToken)">
+            <summary>
+            Load <see cref="T:Microsoft.Bot.Builder.ConnectorEx.ResumptionData"/> from <see cref="F:Microsoft.Bot.Builder.ConnectorEx.ResumptionContext.botDataBag"/>.
+            </summary>
+            <param name="token"> The cancellation token.</param>
+        </member>
+        <member name="M:Microsoft.Bot.Builder.ConnectorEx.ResumptionContext.SaveDataAsync(Microsoft.Bot.Builder.ConnectorEx.ResumptionData,System.Threading.CancellationToken)">
+            <summary>
+            Save the <paramref name="data"/> in <see cref="F:Microsoft.Bot.Builder.ConnectorEx.ResumptionContext.botDataBag"/>.
+            </summary>
+            <param name="data"> The <see cref="T:Microsoft.Bot.Builder.ConnectorEx.ResumptionData"/>.</param>
+            <param name="token"> The cancellation token.</param>
+        </member>
+        <member name="T:Microsoft.Bot.Builder.ConnectorEx.ConversationReferenceHelpers">
+            <summary>
+            Helpers for <see cref="T:Microsoft.Bot.Connector.ConversationReference"/> 
+            </summary>
+        </member>
+        <member name="M:Microsoft.Bot.Builder.ConnectorEx.ConversationReferenceHelpers.GZipDeserialize(System.String)">
+            <summary>
+            Deserializes the GZip serialized <see cref="T:Microsoft.Bot.Connector.ConversationReference"/> using <see cref="M:Microsoft.Bot.Builder.ConnectorEx.Extensions.GZipSerialize(Microsoft.Bot.Connector.ConversationReference)"/>.
+            </summary>
+            <param name="str"> The Base64 encoded string.</param>
+            <returns> An instance of <see cref="T:Microsoft.Bot.Connector.ConversationReference"/></returns>
+        </member>
+        <member name="M:Microsoft.Bot.Builder.ConnectorEx.Extensions.ToConversationReference(Microsoft.Bot.Builder.Dialogs.IAddress)">
+            <summary>
+            Creates a <see cref="T:Microsoft.Bot.Connector.ConversationReference"/> from <see cref="T:Microsoft.Bot.Builder.Dialogs.IAddress"/>.
+            </summary>
+            <param name="address"> The address.</param>
+            <returns> The <see cref="T:Microsoft.Bot.Connector.ConversationReference"/>.</returns>
+        </member>
+        <member name="M:Microsoft.Bot.Builder.ConnectorEx.Extensions.ToConversationReference(Microsoft.Bot.Builder.Dialogs.ResumptionCookie)">
+            <summary>
+            Creates a <see cref="T:Microsoft.Bot.Connector.ConversationReference"/> from <see cref="T:Microsoft.Bot.Builder.Dialogs.ResumptionCookie"/>.
+            </summary>
+            <param name="resumptionCookie"> The resumption cookie.</param>
+            <returns> The <see cref="T:Microsoft.Bot.Connector.ConversationReference"/>.</returns>
+        </member>
+        <member name="M:Microsoft.Bot.Builder.ConnectorEx.Extensions.ToConversationReference(Microsoft.Bot.Connector.IActivity)">
+            <summary>
+            Creates a <see cref="T:Microsoft.Bot.Connector.ConversationReference"/> from <see cref="T:Microsoft.Bot.Connector.IActivity"/>.
+            </summary>
+            <param name="activity"> The <see cref="T:Microsoft.Bot.Connector.IActivity"/>  posted to bot.</param>
+            <returns> The <see cref="T:Microsoft.Bot.Connector.ConversationReference"/>.</returns>
+        </member>
+        <member name="M:Microsoft.Bot.Builder.ConnectorEx.Extensions.GZipSerialize(Microsoft.Bot.Connector.ConversationReference)">
+            <summary>
+            Binary serializes <see cref="T:Microsoft.Bot.Connector.ConversationReference"/> using <see cref="T:System.IO.Compression.GZipStream"/>.
+            </summary>
+            <param name="conversationReference"> The resumption cookie.</param>
+            <returns> A Base64 encoded string.</returns>
+        </member>
+        <member name="T:Microsoft.Bot.Builder.History.IActivityLogger">
+            <summary>
+            Log message activities between bots and users.
+            </summary>
+        </member>
+        <member name="T:Microsoft.Bot.Builder.History.TraceActivityLogger">
+            <summary>
+            Activity logger that traces to the console.
+            </summary>
+            <remarks>
+            To use this, you need to register the class like this:
+            <code>           
+            var builder = new ContainerBuilder();
+            builder.RegisterModule(Dialog_Manager.MakeRoot());
+            builder.RegisterType&lt;TraceActivityLogger&gt;()
+                   .AsImplementedInterfaces()
+                   .InstancePerLifetimeScope();
+            </code>
+            </remarks>
+        </member>
+        <member name="M:Microsoft.Bot.Builder.History.TraceActivityLogger.Microsoft#Bot#Builder#History#IActivityLogger#LogAsync(Microsoft.Bot.Connector.IActivity)">
+            <summary>
+            Log activity to trace stream.
+            </summary>
+            <param name="activity">Activity to log.</param>
+            <returns></returns>
+        </member>
+        <member name="T:Microsoft.Bot.Builder.History.NullActivityLogger">
+            <summary>
+            Activity logger that doesn't log.
+            </summary>
+        </member>
+        <member name="M:Microsoft.Bot.Builder.History.NullActivityLogger.Microsoft#Bot#Builder#History#IActivityLogger#LogAsync(Microsoft.Bot.Connector.IActivity)">
+            <summary>
+            Swallow activity.
+            </summary>
+            <param name="activity">Activity to be logged.</param>
+            <returns></returns>
+        </member>
         <member name="T:Microsoft.Bot.Builder.FormFlow.Advanced.FieldReflector`1">
             <summary>   Fill in field information through reflection.</summary>
-            <remarks>   The resulting information can be overriden through the fluent interface.</remarks>
+            <remarks>   The resulting information can be overridden through the fluent interface.</remarks>
             <typeparam name="T">    The form state. </typeparam>
         </member>
         <member name="M:Microsoft.Bot.Builder.FormFlow.Advanced.FieldReflector`1.#ctor(System.String,System.Boolean)">
@@ -1272,6 +2255,15 @@
             <remarks>Delegate for dynamically defining a field prompt and recognizer.  You can make use of the fluent methods
                      on <see cref="T:Microsoft.Bot.Builder.FormFlow.Advanced.Field`1"/> to change the characteristics of the field.</remarks>
         </member>
+        <member name="T:Microsoft.Bot.Builder.FormFlow.Advanced.NextDelegate`1">
+            <summary>
+            A delegate for deciding on the next step in the form to execute.
+            </summary>
+            <typeparam name="T">Form state type.</typeparam>
+            <param name="value">Value just entered for field.</param>
+            <param name="state">Current state object.</param>
+            <returns></returns>
+        </member>
         <member name="T:Microsoft.Bot.Builder.FormFlow.Advanced.Field`1">
             <summary>Base class with declarative implementation of IField. </summary>
             <typeparam name="T">Underlying form state.</typeparam>
@@ -1286,22 +2278,42 @@
             <param name="description">Field description. </param>
             <returns>   A <see cref="T:Microsoft.Bot.Builder.FormFlow.Advanced.Field`1"/>. </returns>
         </member>
+        <member name="M:Microsoft.Bot.Builder.FormFlow.Advanced.Field`1.SetFieldDescription(Microsoft.Bot.Builder.FormFlow.DescribeAttribute)">
+            <summary>
+            Set the full field description.
+            </summary>
+            <param name="description">The field description.</param>
+            <returns>A <see cref="T:Microsoft.Bot.Builder.FormFlow.Advanced.Field`1"/>. </returns>
+        </member>
         <member name="M:Microsoft.Bot.Builder.FormFlow.Advanced.Field`1.SetFieldTerms(System.String[])">
             <summary>   Set the terms associated with the field. </summary>
             <param name="terms">    The terms. </param>
             <returns>   A <see cref="T:Microsoft.Bot.Builder.FormFlow.Advanced.Field`1"/>. </returns>
         </member>
-        <member name="M:Microsoft.Bot.Builder.FormFlow.Advanced.Field`1.AddDescription(System.Object,System.String,System.String)">
+        <member name="M:Microsoft.Bot.Builder.FormFlow.Advanced.Field`1.AddDescription(System.Object,System.String,System.String,System.String)">
             <summary>   Adds a description for a value. </summary>
             <param name="value">        The value. </param>
             <param name="description">  Description of the value. </param>
             <param name="image">Image to use for value as button.</param>
+            <param name="message">Message to return when button is pressed.</param>
+            <returns>   A <see cref="T:Microsoft.Bot.Builder.FormFlow.Advanced.Field`1"/>. </returns>
+        </member>
+        <member name="M:Microsoft.Bot.Builder.FormFlow.Advanced.Field`1.AddDescription(System.Object,Microsoft.Bot.Builder.FormFlow.DescribeAttribute)">
+            <summary>   Adds a full description for a value. </summary>
+            <param name="value">        The value. </param>
+            <param name="description">  Description of the value. </param>
             <returns>   A <see cref="T:Microsoft.Bot.Builder.FormFlow.Advanced.Field`1"/>. </returns>
         </member>
         <member name="M:Microsoft.Bot.Builder.FormFlow.Advanced.Field`1.AddTerms(System.Object,System.String[])">
             <summary>   Adds terms for a value. </summary>
             <param name="value">    The value. </param>
             <param name="terms">    The terms. </param>
+            <returns>   A <see cref="T:Microsoft.Bot.Builder.FormFlow.Advanced.Field`1"/>. </returns>
+        </member>
+        <member name="M:Microsoft.Bot.Builder.FormFlow.Advanced.Field`1.AddTerms(System.Object,Microsoft.Bot.Builder.FormFlow.TermsAttribute)">
+            <summary>   Adds terms for a value. </summary>
+            <param name="value">    The value. </param>
+            <param name="terms">    The terms to add. </param>
             <returns>   A <see cref="T:Microsoft.Bot.Builder.FormFlow.Advanced.Field`1"/>. </returns>
         </member>
         <member name="M:Microsoft.Bot.Builder.FormFlow.Advanced.Field`1.RemoveValue(System.Object)">
@@ -1386,6 +2398,12 @@
             <summary>   Define the fields this field depends on. </summary>
             <param name="dependencies"> A variable-length parameters list containing dependencies. </param>
             <returns>   A <see cref="T:Microsoft.Bot.Builder.FormFlow.Advanced.Field`1"/>. </returns>
+        </member>
+        <member name="M:Microsoft.Bot.Builder.FormFlow.Advanced.Field`1.SetNext(Microsoft.Bot.Builder.FormFlow.Advanced.NextDelegate{`0})">
+            <summary>
+            Delegate for deciding on the next form step to execute.
+            </summary>
+            <returns>A <see cref="T:Microsoft.Bot.Builder.FormFlow.Advanced.Field`1"/>.</returns>
         </member>
         <member name="T:Microsoft.Bot.Builder.FormFlow.Advanced.Fields`1">
             <summary>
@@ -1519,11 +2537,11 @@
         </member>
         <member name="P:Microsoft.Bot.Builder.FormFlow.Advanced.IFieldDescription.FieldDescription">
             <summary>
-            Decription of the field itself.
+            Description of the field itself.
             </summary>
             <returns>Field description.</returns>
             <remarks>
-            This is the value that will be generated in \ref patterns by {&amp;} or choices. {||}.
+            This is the value that will be used in \ref patterns by {&amp;}, choices with {||} or buttons.
             </remarks>
         </member>
         <member name="P:Microsoft.Bot.Builder.FormFlow.Advanced.IFieldDescription.FieldTerms">
@@ -1534,7 +2552,7 @@
         </member>
         <member name="M:Microsoft.Bot.Builder.FormFlow.Advanced.IFieldDescription.ValueDescription(System.Object)">
             <summary>
-            Return the string describing a specific value.
+            Return the description of a specific value.
             </summary>
             <param name="value">Value being described.</param>
             <returns>Description of value.</returns>
@@ -1686,7 +2704,7 @@
         <member name="P:Microsoft.Bot.Builder.FormFlow.Advanced.IFieldPrompt`1.Prompt">
             <summary>   Returns the prompt description. </summary>
             <returns>   An <see cref="T:Microsoft.Bot.Builder.FormFlow.Advanced.IPrompt`1"/> describing prompt and recognizer. </returns>
-            <remarks>If a prompt is dyhamically computed this should be null until <see cref="M:Microsoft.Bot.Builder.FormFlow.Advanced.IFieldPrompt`1.DefineAsync(`0)"/> is called.</remarks>
+            <remarks>If a prompt is dynamically computed this should be null until <see cref="M:Microsoft.Bot.Builder.FormFlow.Advanced.IFieldPrompt`1.DefineAsync(`0)"/> is called.</remarks>
         </member>
         <member name="M:Microsoft.Bot.Builder.FormFlow.Advanced.IFieldPrompt`1.DefineAsync(`0)">
             <summary>
@@ -1783,7 +2801,7 @@
         </member>
         <member name="M:Microsoft.Bot.Builder.FormFlow.Advanced.ILocalizer.Add(System.String,System.Collections.Generic.IEnumerable{System.String})">
             <summary>
-            Add a key and a list of translations seperated by semi-colon.
+            Add a key and a list of translations separated by semi-colon.
             </summary>
             <param name="key">Key for indexing translation list.</param>
             <param name="list">List of translated terms.</param>
@@ -1794,17 +2812,17 @@
             <param name="dictionary">   The dictionary to add. </param>
         </member>
         <member name="M:Microsoft.Bot.Builder.FormFlow.Advanced.ILocalizer.Add(System.String,System.Collections.Generic.IReadOnlyDictionary{System.Object,Microsoft.Bot.Builder.FormFlow.TermsAttribute})">
-            <summary>   Adds values from dictionary seperated by semi-colons under object if enumeration and prefix;object otherwise.</summary>
+            <summary>   Adds values from dictionary separated by semi-colons under object if enumeration and prefix;object otherwise.</summary>
             <param name="prefix">       The resource prefix. </param>
             <param name="dictionary">   The dictionary to add. </param>
         </member>
         <member name="M:Microsoft.Bot.Builder.FormFlow.Advanced.ILocalizer.Add(System.String,System.Collections.Generic.IReadOnlyDictionary{Microsoft.Bot.Builder.FormFlow.TemplateUsage,Microsoft.Bot.Builder.FormFlow.TemplateAttribute})">
-            <summary>   Adds patterns from template seperated by semi-colons under prefix;usage. </summary>
+            <summary>   Adds patterns from template separated by semi-colons under prefix;usage. </summary>
             <param name="prefix">       The resource prefix. </param>
             <param name="templates">    The template dictionary to add. </param>
         </member>
         <member name="M:Microsoft.Bot.Builder.FormFlow.Advanced.ILocalizer.Add(System.String,Microsoft.Bot.Builder.FormFlow.TemplateAttribute)">
-            <summary>   Adds patterns from template seperated by semi-colons under prefix;usage.</summary>
+            <summary>   Adds patterns from template separated by semi-colons under prefix;usage.</summary>
             <param name="prefix">       The resource prefix. </param>
             <param name="template">     The template to add. </param>
         </member>
@@ -1851,7 +2869,7 @@
             </summary>
             <param name="writer">Where to write resources.</param>
             <remarks>
-            Resource values are all strings.  The key and value can have different parts seperated by semi-colons.
+            Resource values are all strings.  The key and value can have different parts separated by semi-colons.
             Key | Value | Description
             ----|-------|------------
             key;VALUE | string | Simple value.
@@ -2273,6 +3291,29 @@
             <param name="type">Type to check.</param>
             <returns>True if implements generic IEnumerable.</returns>
         </member>
+        <member name="M:Microsoft.Bot.Builder.FormFlow.Advanced.Extensions.GenerateHeroCard(Microsoft.Bot.Builder.FormFlow.Advanced.FormPrompt)">
+            <summary>
+            Generate a hero card from a FormPrompt.
+            </summary>
+            <param name="prompt">Prompt definition.</param>
+            <returns>Either an empty list if no buttons or a list with one hero card.</returns>
+        </member>
+        <member name="M:Microsoft.Bot.Builder.FormFlow.Advanced.Extensions.GenerateHeroCards(Microsoft.Bot.Builder.FormFlow.Advanced.FormPrompt)">
+            <summary>
+            Generate a list of hero cards from a prompt definition.
+            </summary>
+            <param name="prompt">Prompt definition.</param>
+            <returns>List of hero cards.</returns>
+        </member>
+        <member name="M:Microsoft.Bot.Builder.FormFlow.Advanced.Extensions.GenerateMessages(Microsoft.Bot.Builder.FormFlow.Advanced.FormPrompt,Microsoft.Bot.Connector.IMessageActivity,Microsoft.Bot.Connector.IMessageActivity)">
+            <summary>
+            Given a prompt definition generate messages to send back.
+            </summary>
+            <param name="prompt">Prompt definition.</param>
+            <param name="preamble">Simple text message with all except last line of prompt to allow markdown in prompts.</param>
+            <param name="promptMessage">Message with prompt definition including cards.</param>
+            <returns>True if preamble should be sent.</returns>
+        </member>
         <member name="T:Microsoft.Bot.Builder.FormFlow.Advanced.IPrompt`1">
             <summary>
             Interface for a prompt and its associated recognizer.
@@ -2288,12 +3329,12 @@
             </summary>
             <returns>Attribute describing how to generate prompt.</returns>
         </member>
-        <member name="M:Microsoft.Bot.Builder.FormFlow.Advanced.IPrompt`1.Prompt(`0,System.String,System.Object[])">
+        <member name="M:Microsoft.Bot.Builder.FormFlow.Advanced.IPrompt`1.Prompt(`0,Microsoft.Bot.Builder.FormFlow.Advanced.IField{`0},System.Object[])">
             <summary>
             Return prompt to send to user.
             </summary>
             <param name="state">Current form state.</param>
-            <param name="path">Current field being processed.</param>
+            <param name="field">Current field being processed.</param>
             <param name="args">Optional arguments.</param>
             <returns>Message to user.</returns>
         </member>
@@ -2312,10 +3353,21 @@
             <summary>
             The text prompt that corresponds to Message.Text.
             </summary>
+            <remarks>When generating cards this will be the card title.</remarks>
+        </member>
+        <member name="P:Microsoft.Bot.Builder.FormFlow.Advanced.FormPrompt.Description">
+            <summary>
+            Description information for generating cards.
+            </summary>
         </member>
         <member name="P:Microsoft.Bot.Builder.FormFlow.Advanced.FormPrompt.Buttons">
             <summary>
             The buttons that will be mapped to Message.Attachments.
+            </summary>
+        </member>
+        <member name="F:Microsoft.Bot.Builder.FormFlow.Advanced.FormPrompt.Style">
+            <summary>
+            Desired prompt style.
             </summary>
         </member>
         <member name="M:Microsoft.Bot.Builder.FormFlow.Advanced.FormPrompt.Clone">
@@ -2361,6 +3413,16 @@
             </summary>
             <returns> Title of the button.</returns>
         </member>
+        <member name="T:Microsoft.Bot.Builder.FormFlow.Advanced.PromptAsyncDelegate`1">
+            <summary>
+            A delegate for styling and posting a prompt.
+            </summary>
+            <param name="context">Message context.</param>
+            <param name="prompt">Prompt to be posted.</param>
+            <param name="state">State of the form.</param>
+            <param name="field">Field being prompted or null if not a field.</param>
+            <returns>Prompt that was posted.</returns>
+        </member>
         <member name="T:Microsoft.Bot.Builder.FormFlow.Advanced.Prompter`1">
             <summary>   A prompt and recognizer packaged together. </summary>
             <typeparam name="T">    UNderlying form type. </typeparam>
@@ -2374,11 +3436,11 @@
             <param name="recognizer">Recognizer if any.</param>
             <param name="fields">Fields name lookup.  (Defaults to forms.)</param>
         </member>
-        <member name="M:Microsoft.Bot.Builder.FormFlow.Advanced.Prompter`1.ValidatePattern(Microsoft.Bot.Builder.FormFlow.IForm{`0},System.String,System.String,System.Int32)">
+        <member name="M:Microsoft.Bot.Builder.FormFlow.Advanced.Prompter`1.ValidatePattern(Microsoft.Bot.Builder.FormFlow.IForm{`0},System.String,Microsoft.Bot.Builder.FormFlow.Advanced.IField{`0},System.Int32)">
             <summary>   Validate pattern by ensuring they refer to real fields. </summary>
             <param name="form">     The form. </param>
             <param name="pattern">  Specifies the pattern. </param>
-            <param name="pathName"> Full pathname of the field. </param>
+            <param name="field"> Base field for pattern. </param>
             <param name="argLimit"> The number of arguments passed to the pattern. </param>
             <returns>   true if it succeeds, false if it fails. </returns>
         </member>
@@ -2567,7 +3629,7 @@
         </member>
         <member name="M:Microsoft.Bot.Builder.FormFlow.FormDialog`1.#ctor(`0,Microsoft.Bot.Builder.FormFlow.BuildFormDelegate{`0},Microsoft.Bot.Builder.FormFlow.FormOptions,System.Collections.Generic.IEnumerable{Microsoft.Bot.Builder.Luis.Models.EntityRecommendation},System.Globalization.CultureInfo)">
             <summary>   Constructor for creating a FormFlow dialog. </summary>
-            <param name="state">        The intial state. </param>
+            <param name="state">        The initial state. </param>
             <param name="buildForm">    A delegate for building the form. </param>
             <param name="options">      Options for controlling the form. </param>
             <param name="entities">     Optional entities to process into the form. </param>
@@ -2597,7 +3659,7 @@
             <see cref="T:Microsoft.Bot.Builder.FormFlow.PromptAttribute"/>, 
             <see cref="T:Microsoft.Bot.Builder.FormFlow.TermsAttribute"/> and 
             <see cref="T:Microsoft.Bot.Builder.FormFlow.TemplateAttribute"/>.   
-            For all of the attributes, resonable defaults will be generated.
+            For all of the attributes, reasonable defaults will be generated.
             </remarks>
         </member>
         <member name="M:Microsoft.Bot.Builder.FormFlow.FormBuilder`1.#ctor(System.Boolean)">
@@ -2765,6 +3827,13 @@
             <param name="dependencies">What fields this confirmation depends on.</param>
             <returns>Modified IFormBuilder.</returns>
         </member>
+        <member name="M:Microsoft.Bot.Builder.FormFlow.IFormBuilder`1.Prompter(Microsoft.Bot.Builder.FormFlow.Advanced.PromptAsyncDelegate{`0})">
+            <summary>
+            Delegate to send prompt to user.
+            </summary>
+            <param name="prompter">Delegate.</param>
+            <returns>Modified IFormBuilder.</returns>
+        </member>
         <member name="M:Microsoft.Bot.Builder.FormFlow.IFormBuilder`1.OnCompletion(Microsoft.Bot.Builder.FormFlow.OnCompletionAsyncDelegate{`0})">
             <summary>
             Delegate to call when form is completed.
@@ -2789,7 +3858,7 @@
             Default values for the form.
             </summary>
             <remarks>
-            These defaults can all be overriden when you create a form and before you add steps.
+            These defaults can all be overridden when you create a form and before you add steps.
             </remarks>
         </member>
         <member name="M:Microsoft.Bot.Builder.FormFlow.FormConfiguration.#ctor">
@@ -2835,6 +3904,11 @@
         <member name="F:Microsoft.Bot.Builder.FormFlow.FormConfiguration.Navigation">
             <summary>
             String for naming the "navigation" field.
+            </summary>
+        </member>
+        <member name="F:Microsoft.Bot.Builder.FormFlow.FormConfiguration.Confirmation">
+            <summary>
+            String for naming "Confirmation" fields.
             </summary>
         </member>
         <member name="F:Microsoft.Bot.Builder.FormFlow.FormConfiguration.Templates">
@@ -2897,20 +3971,38 @@
         </member>
         <member name="F:Microsoft.Bot.Builder.FormFlow.DescribeAttribute.Description">
             <summary>
-            Description of the field, property or enum.
+            Description of the field, property or enum to use in templates and choices.
+            </summary>
+        </member>
+        <member name="F:Microsoft.Bot.Builder.FormFlow.DescribeAttribute.Title">
+            <summary>
+            Title when a card is generated from description.
+            </summary>
+        </member>
+        <member name="F:Microsoft.Bot.Builder.FormFlow.DescribeAttribute.SubTitle">
+            <summary>
+            SubTitle when a card is generated from description.
             </summary>
         </member>
         <member name="F:Microsoft.Bot.Builder.FormFlow.DescribeAttribute.Image">
             <summary>
-            URL of image to use when creating buttons.
+            URL of image to use when creating cards or buttons.
             </summary>
         </member>
-        <member name="M:Microsoft.Bot.Builder.FormFlow.DescribeAttribute.#ctor(System.String,System.String)">
+        <member name="F:Microsoft.Bot.Builder.FormFlow.DescribeAttribute.Message">
+            <summary>
+            Message to return when a button is pressed in a card.
+            </summary>
+        </member>
+        <member name="M:Microsoft.Bot.Builder.FormFlow.DescribeAttribute.#ctor(System.String,System.String,System.String,System.String,System.String)">
             <summary>
             Description for field, property or enum value.
             </summary>
             <param name="description">Description of field, property or enum value.</param>
             <param name="image">URL of image to use when generating buttons.</param>
+            <param name="message">Message to return from button.</param>
+            <param name="title">Text if generating card.</param>
+            <param name="subTitle">SubTitle if generating card.</param>
         </member>
         <member name="T:Microsoft.Bot.Builder.FormFlow.TermsAttribute">
             <summary>
@@ -2920,7 +4012,8 @@
             By default terms are generated by calling the <see cref="M:Microsoft.Bot.Builder.FormFlow.Advanced.Language.GenerateTerms(System.String,System.Int32)"/> method with a max phrase length of 3
             on the name of the field, property or enum value.  Using this attribute you can specify your own regular expressions to match or if you specify the 
             <see cref="P:Microsoft.Bot.Builder.FormFlow.TermsAttribute.MaxPhrase"/> attribute you can cause <see cref="M:Microsoft.Bot.Builder.FormFlow.Advanced.Language.GenerateTerms(System.String,System.Int32)"/> to be called on your strings with the
-            maximum phrase length you specify.
+            maximum phrase length you specify.  If your term is a simple alphanumeric one, then it will only be matched on word boundaries with \b unless you start your
+            expression with parentheses in which case you control the boundary matching behavior through your regular expression.
             </remarks>
         </member>
         <member name="F:Microsoft.Bot.Builder.FormFlow.TermsAttribute.Alternatives">
@@ -2975,6 +4068,16 @@
         </member>
         <member name="F:Microsoft.Bot.Builder.FormFlow.ChoiceStyleOptions.InlineNoParen">
             <summary>   Show choices on the same line without surrounding parentheses. </summary>
+        </member>
+        <member name="F:Microsoft.Bot.Builder.FormFlow.ChoiceStyleOptions.Buttons">
+            <summary>
+            Show choices as buttons if possible.
+            </summary>
+        </member>
+        <member name="F:Microsoft.Bot.Builder.FormFlow.ChoiceStyleOptions.Carousel">
+            <summary>
+            Show choices as a carousel if possibe.
+            </summary>
         </member>
         <member name="T:Microsoft.Bot.Builder.FormFlow.CaseNormalization">
             <summary>
@@ -3056,10 +4159,12 @@
         </member>
         <member name="T:Microsoft.Bot.Builder.FormFlow.PromptAttribute">
             <summary>
-            Define the prompt template used when asking about a field.
+            Define the prompt used when asking about a field.
             </summary>
             <remarks>
-            Prompts use \ref Templates to provide control over what goes into a prompt.
+            Prompts by default will come from \ref Templates.  
+            This attribute allows you to override this with one more \ref patterns strings. 
+            The actual prompt will be randomly selected from the alternatives you provide.
             </remarks>
         </member>
         <member name="M:Microsoft.Bot.Builder.FormFlow.PromptAttribute.#ctor(System.String[])">
@@ -3405,11 +4510,42 @@
             <param name="state">Form state to test.</param>
             <returns>True if step is active given the current form state.</returns>
         </member>
+        <member name="T:Microsoft.Bot.Builder.FormFlow.Choice">
+            <summary>
+            Choice for clarifying an ambiguous value in <see cref="T:Microsoft.Bot.Builder.FormFlow.ValidateResult"/>.
+            </summary>
+        </member>
+        <member name="F:Microsoft.Bot.Builder.FormFlow.Choice.Value">
+            <summary>
+            Value to return if choice is selected.
+            </summary>
+        </member>
+        <member name="F:Microsoft.Bot.Builder.FormFlow.Choice.Description">
+            <summary>
+            Description of value.
+            </summary>
+        </member>
+        <member name="F:Microsoft.Bot.Builder.FormFlow.Choice.Terms">
+            <summary>
+            Terms to match value.
+            </summary>
+        </member>
         <member name="T:Microsoft.Bot.Builder.FormFlow.ValidateResult">
             <summary>   Encapsulates the result of a <see cref="T:Microsoft.Bot.Builder.FormFlow.ValidateAsyncDelegate`1"/> </summary>
+            <remarks>
+                     If <see cref="F:Microsoft.Bot.Builder.FormFlow.ValidateResult.IsValid"/> is true, then the field will be set to <see cref="F:Microsoft.Bot.Builder.FormFlow.ValidateResult.Value"/>.
+                     Otherwise if <see cref="F:Microsoft.Bot.Builder.FormFlow.ValidateResult.Choices"/> is  non-null they will be used to select a clarifying value.
+                     if <see cref="F:Microsoft.Bot.Builder.FormFlow.ValidateResult.FeedbackCard"/> is non-null the resulting card will be displayed.
+                     Otherwise the <see cref="F:Microsoft.Bot.Builder.FormFlow.ValidateResult.Feedback"/> string will be shown to provide feedback on the value.
+                     </remarks>
         </member>
         <member name="F:Microsoft.Bot.Builder.FormFlow.ValidateResult.Feedback">
             <summary>   Feedback to provide back to the user on the input. </summary>
+        </member>
+        <member name="F:Microsoft.Bot.Builder.FormFlow.ValidateResult.FeedbackCard">
+            <summary>
+            Fully specified feedback card.
+            </summary>
         </member>
         <member name="F:Microsoft.Bot.Builder.FormFlow.ValidateResult.IsValid">
             <summary>   True if value is a valid response. </summary>
@@ -3420,6 +4556,11 @@
             </summary>
             <remarks>This provides an opportunity for validation to compute the final value.</remarks>
         </member>
+        <member name="F:Microsoft.Bot.Builder.FormFlow.ValidateResult.Choices">
+            <summary>
+            Choices for clarifying response.
+            </summary>
+        </member>
         <member name="T:Microsoft.Bot.Builder.FormFlow.ValidateAsyncDelegate`1">
             <summary>
             A delegate for validating a particular response to a prompt.
@@ -3427,7 +4568,7 @@
             <typeparam name="T">Form state type.</typeparam>
             <param name="state">Form state to test.</param>
             <param name="value">Response value to validate.</param>
-            <returns>Null if value is valid otherwise feedback on what is wrong.</returns>
+            <returns><see cref="T:Microsoft.Bot.Builder.FormFlow.ValidateResult"/> describing validity, transformed value, feedback or choices for clarification.</returns>
         </member>
         <member name="T:Microsoft.Bot.Builder.FormFlow.OnCompletionAsyncDelegate`1">
             <summary>
@@ -3545,62 +4686,50 @@
         <member name="P:Microsoft.Bot.Builder.FormFlow.FormCanceledException`1.LastForm">
             <summary>   Gets the partial form when the user quits or there is an exception. </summary>
         </member>
-        <member name="T:Microsoft.Bot.Builder.Luis.LuisModelAttribute">
+        <member name="T:Microsoft.Bot.Builder.Luis.ICalendarPlus">
             <summary>
-            The LUIS model information.
+            Policy for interpreting LUIS resolutions.
             </summary>
         </member>
-        <member name="F:Microsoft.Bot.Builder.Luis.LuisModelAttribute.ModelID">
+        <member name="T:Microsoft.Bot.Builder.Luis.WesternCalendarPlus">
             <summary>
-            The LUIS model ID.
+            https://en.wikipedia.org/wiki/Gregorian_calendar
             </summary>
         </member>
-        <member name="F:Microsoft.Bot.Builder.Luis.LuisModelAttribute.SubscriptionKey">
+        <member name="T:Microsoft.Bot.Builder.Luis.IEntityToType">
             <summary>
-            The LUIS subscription key.
+            An abtraction to map from a LUIS <see cref="T:Microsoft.Bot.Builder.Luis.Models.EntityRecommendation"/> to specific CLR types. 
             </summary>
         </member>
-        <member name="M:Microsoft.Bot.Builder.Luis.LuisModelAttribute.#ctor(System.String,System.String)">
+        <member name="M:Microsoft.Bot.Builder.Luis.IEntityToType.TryMapToTimeSpan(System.DateTime,System.Collections.Generic.IEnumerable{Microsoft.Bot.Builder.Luis.Models.EntityRecommendation},System.TimeSpan@)">
             <summary>
-            Construct the LUIS model information.
+            Try to map LUIS <see cref="T:Microsoft.Bot.Builder.Luis.Models.EntityRecommendation"/> instances to a <see cref="T:System.TimeSpan"/>, relative to now.
             </summary>
-            <param name="modelID">The LUIS model ID.</param>
-            <param name="subscriptionKey">The LUIS subscription key.</param>
+            <param name="now">The now reference <see cref="T:System.DateTime"/>.</param>
+            <param name="entities">A list of possibly-relevant <see cref="T:Microsoft.Bot.Builder.Luis.Models.EntityRecommendation"/> instances.</param>
+            <param name="span">The output <see cref="T:System.TimeSpan"/>.</param>
+            <returns>True if the mapping may have been successful, false otherwise.</returns>
         </member>
-        <member name="T:Microsoft.Bot.Builder.Luis.ILuisService">
+        <member name="M:Microsoft.Bot.Builder.Luis.IEntityToType.TryMapToDateRanges(System.DateTime,System.Collections.Generic.IEnumerable{Microsoft.Bot.Builder.Luis.Models.EntityRecommendation},System.Collections.Generic.IEnumerable{Microsoft.Bot.Builder.Internals.Fibers.Range{System.DateTime}}@)">
             <summary>
-            A mockable interface for the LUIS service.
+            Try to map LUIS <see cref="T:Microsoft.Bot.Builder.Luis.Models.EntityRecommendation"/> instances to a list of <see cref="T:System.DateTime"/> ranges, relative to now.
             </summary>
+            <param name="now">The now reference <see cref="T:System.DateTime"/>.</param>
+            <param name="entities">A list of possibly-relevant <see cref="T:Microsoft.Bot.Builder.Luis.Models.EntityRecommendation"/> instances.</param>
+            <param name="ranges">The output <see cref="T:System.DateTime"/> ranges.</param>
+            <returns>True if the mapping may have been successful, false otherwise.</returns>
         </member>
-        <member name="M:Microsoft.Bot.Builder.Luis.ILuisService.BuildUri(System.String)">
+        <member name="M:Microsoft.Bot.Builder.Luis.StrictEntityToType.Interpret(Microsoft.Bot.Builder.Luis.BuiltIn.DateTime.DateTimeResolution,System.DateTime,System.Globalization.Calendar,System.Globalization.CalendarWeekRule,System.DayOfWeek,System.Func{Microsoft.Bot.Builder.Luis.BuiltIn.DateTime.DayPart,System.Int32})">
             <summary>
-            Build the query uri for the query text.
+            Interpret a parsed DateTimeResolution to provide a series of DateTime ranges
             </summary>
-            <param name="text">The query text.</param>
-            <returns>The query uri.</returns>
-        </member>
-        <member name="M:Microsoft.Bot.Builder.Luis.ILuisService.QueryAsync(System.Uri)">
-            <summary>
-            Query the LUIS service using this uri.
-            </summary>
-            <param name="uri">The query uri.</param>
-            <returns>The LUIS result.</returns>
-        </member>
-        <member name="T:Microsoft.Bot.Builder.Luis.LuisService">
-            <summary>
-            Standard implementation of ILuisService against actual LUIS service.
-            </summary>
-        </member>
-        <member name="M:Microsoft.Bot.Builder.Luis.LuisService.#ctor(Microsoft.Bot.Builder.Luis.LuisModelAttribute)">
-            <summary>
-            Construct the LUIS service using the model information.
-            </summary>
-            <param name="model">The LUIS model information.</param>
-        </member>
-        <member name="F:Microsoft.Bot.Builder.Luis.LuisService.UriBase">
-            <summary>
-            The base URi for accessing LUIS.
-            </summary>
+            <param name="resolution">The DateTimeResolution parsed from a LUIS response.</param>
+            <param name="now">The reference point of "now".</param>
+            <param name="calendar">The calendar to use for date math.</param>
+            <param name="rule">The calendar week rule to use for date math.</param>
+            <param name="firstDayOfWeek">The first day of the week to use for date math.</param>
+            <param name="HourFor">The hour that corresponds to the <see cref="T:Microsoft.Bot.Builder.Luis.BuiltIn.DateTime.DayPart"/> enumeration.</param>
+            <returns>A potentially infinite series of DateTime ranges.</returns>
         </member>
         <member name="T:Microsoft.Bot.Builder.Luis.Extensions">
             <summary>
@@ -3610,14 +4739,6 @@
             LUIS extension methods.
             </summary>
         </member>
-        <member name="M:Microsoft.Bot.Builder.Luis.Extensions.QueryAsync(Microsoft.Bot.Builder.Luis.ILuisService,System.String)">
-            <summary>
-            Query the LUIS service using this text.
-            </summary>
-            <param name="service">LUIS service.</param>
-            <param name="text">The query text.</param>
-            <returns>The LUIS result.</returns>
-        </member>
         <member name="M:Microsoft.Bot.Builder.Luis.Extensions.TryFindEntity(Microsoft.Bot.Builder.Luis.Models.LuisResult,System.String,Microsoft.Bot.Builder.Luis.Models.EntityRecommendation@)">
             <summary>
             Try to find an entity within the result.
@@ -3626,6 +4747,201 @@
             <param name="type">The entity type.</param>
             <param name="entity">The found entity.</param>
             <returns>True if the entity was found, false otherwise.</returns>
+        </member>
+        <member name="M:Microsoft.Bot.Builder.Luis.Extensions.ParseResolutions(Microsoft.Bot.Builder.Luis.IResolutionParser,System.Collections.Generic.IEnumerable{Microsoft.Bot.Builder.Luis.Models.EntityRecommendation})">
+            <summary>
+            Parse all resolutions from a LUIS result.
+            </summary>
+            <param name="parser">The resolution parser.</param>
+            <param name="entities">The LUIS entities.</param>
+            <returns>The parsed resolutions.</returns>
+        </member>
+        <member name="M:Microsoft.Bot.Builder.Luis.Extensions.Next(Microsoft.Bot.Builder.Luis.BuiltIn.DateTime.DayPart)">
+            <summary>
+            Return the next <see cref="T:Microsoft.Bot.Builder.Luis.BuiltIn.DateTime.DayPart"/>. 
+            </summary>
+            <param name="part">The <see cref="T:Microsoft.Bot.Builder.Luis.BuiltIn.DateTime.DayPart"/> query.</param>
+            <returns>The next <see cref="T:Microsoft.Bot.Builder.Luis.BuiltIn.DateTime.DayPart"/> after the query.</returns>
+        </member>
+        <member name="M:Microsoft.Bot.Builder.Luis.Extensions.QueryAsync(Microsoft.Bot.Builder.Luis.ILuisService,System.String,System.Threading.CancellationToken)">
+            <summary>
+            Query the LUIS service using this text.
+            </summary>
+            <param name="service">LUIS service.</param>
+            <param name="text">The query text.</param>
+            <param name="token">The cancellation token.</param>
+            <returns>The LUIS result.</returns>
+        </member>
+        <member name="M:Microsoft.Bot.Builder.Luis.Extensions.BuildUri(Microsoft.Bot.Builder.Luis.ILuisService,System.String)">
+            <summary>
+            Builds luis uri with text query.
+            </summary>
+            <param name="service">LUIS service.</param>
+            <param name="text">The query text.</param>
+            <returns>The LUIS request Uri.</returns>
+        </member>
+        <member name="T:Microsoft.Bot.Builder.Luis.LuisApiVersion">
+            <summary>
+            Luis api version.
+            </summary>
+        </member>
+        <member name="T:Microsoft.Bot.Builder.Luis.ILuisModel">
+            <summary>
+            A mockable interface for the LUIS model.
+            </summary>
+        </member>
+        <member name="P:Microsoft.Bot.Builder.Luis.ILuisModel.ModelID">
+            <summary>
+            The LUIS model ID.
+            </summary>
+        </member>
+        <member name="P:Microsoft.Bot.Builder.Luis.ILuisModel.SubscriptionKey">
+            <summary>
+            The LUIS subscription key.
+            </summary>
+        </member>
+        <member name="P:Microsoft.Bot.Builder.Luis.ILuisModel.UriBase">
+            <summary>
+            The base Uri for accessing LUIS.
+            </summary>
+        </member>
+        <member name="P:Microsoft.Bot.Builder.Luis.ILuisModel.ApiVersion">
+            <summary>
+            Luis Api Version.
+            </summary>
+        </member>
+        <member name="T:Microsoft.Bot.Builder.Luis.LuisModelAttribute">
+            <summary>
+            The LUIS model information.
+            </summary>
+        </member>
+        <member name="M:Microsoft.Bot.Builder.Luis.LuisModelAttribute.#ctor(System.String,System.String,Microsoft.Bot.Builder.Luis.LuisApiVersion)">
+            <summary>
+            Construct the LUIS model information.
+            </summary>
+            <param name="modelID">The LUIS model ID.</param>
+            <param name="subscriptionKey">The LUIS subscription key.</param>
+            <param name="apiVersion">The LUIS API version.</param>
+        </member>
+        <member name="T:Microsoft.Bot.Builder.Luis.Models.CompositeChild">
+            <summary>
+            Child entity in Luis composite entity.
+            </summary>
+        </member>
+        <member name="M:Microsoft.Bot.Builder.Luis.Models.CompositeChild.#ctor">
+            <summary>
+            Initializes a new instance of the CompositeChild class.
+            </summary>
+        </member>
+        <member name="M:Microsoft.Bot.Builder.Luis.Models.CompositeChild.#ctor(System.String,System.String)">
+            <summary>
+            Initializes a new instance of the CompositeChild class.
+            </summary>
+        </member>
+        <member name="P:Microsoft.Bot.Builder.Luis.Models.CompositeChild.Type">
+            <summary>
+            Type of child entity.
+            </summary>
+        </member>
+        <member name="P:Microsoft.Bot.Builder.Luis.Models.CompositeChild.Value">
+            <summary>
+            Value extracted by Luis.
+            </summary>
+        </member>
+        <member name="M:Microsoft.Bot.Builder.Luis.Models.CompositeChild.Validate">
+            <summary>
+            Validate the object. Throws ValidationException if validation fails.
+            </summary>
+        </member>
+        <member name="T:Microsoft.Bot.Builder.Luis.Models.CompositeEntity">
+            <summary>
+            Luis composite entity. Look at https://www.luis.ai/Help for more
+            information.
+            </summary>
+        </member>
+        <member name="M:Microsoft.Bot.Builder.Luis.Models.CompositeEntity.#ctor">
+            <summary>
+            Initializes a new instance of the CompositeEntity class.
+            </summary>
+        </member>
+        <member name="M:Microsoft.Bot.Builder.Luis.Models.CompositeEntity.#ctor(System.String,System.String,System.Collections.Generic.IList{Microsoft.Bot.Builder.Luis.Models.CompositeChild})">
+            <summary>
+            Initializes a new instance of the CompositeEntity class.
+            </summary>
+        </member>
+        <member name="P:Microsoft.Bot.Builder.Luis.Models.CompositeEntity.ParentType">
+            <summary>
+            Type of parent entity.
+            </summary>
+        </member>
+        <member name="P:Microsoft.Bot.Builder.Luis.Models.CompositeEntity.Value">
+            <summary>
+            Value for entity extracted by LUIS.
+            </summary>
+        </member>
+        <member name="P:Microsoft.Bot.Builder.Luis.Models.CompositeEntity.Children">
+            <summary>
+            </summary>
+        </member>
+        <member name="M:Microsoft.Bot.Builder.Luis.Models.CompositeEntity.Validate">
+            <summary>
+            Validate the object. Throws ValidationException if validation fails.
+            </summary>
+        </member>
+        <member name="T:Microsoft.Bot.Builder.Luis.Models.DialogResponse">
+            <summary>
+            The dialog response.
+            </summary>
+        </member>
+        <member name="M:Microsoft.Bot.Builder.Luis.Models.DialogResponse.#ctor">
+            <summary>
+            Initializes a new instance of the DialogResponse class.
+            </summary>
+        </member>
+        <member name="M:Microsoft.Bot.Builder.Luis.Models.DialogResponse.#ctor(System.String,System.String,System.String,System.String,System.String)">
+            <summary>
+            Initializes a new instance of the DialogResponse class.
+            </summary>
+        </member>
+        <member name="P:Microsoft.Bot.Builder.Luis.Models.DialogResponse.Prompt">
+            <summary>
+            Prompt that should be asked.
+            </summary>
+        </member>
+        <member name="P:Microsoft.Bot.Builder.Luis.Models.DialogResponse.ParameterName">
+            <summary>
+            Name of the parameter.
+            </summary>
+        </member>
+        <member name="P:Microsoft.Bot.Builder.Luis.Models.DialogResponse.ParameterType">
+            <summary>
+            Type of the parameter.
+            </summary>
+        </member>
+        <member name="P:Microsoft.Bot.Builder.Luis.Models.DialogResponse.ContextId">
+            <summary>
+            The context id for dialog.
+            </summary>
+        </member>
+        <member name="P:Microsoft.Bot.Builder.Luis.Models.DialogResponse.Status">
+            <summary>
+            The dialog status. Possible values include: 'Question', 'Finished'
+            </summary>
+        </member>
+        <member name="T:Microsoft.Bot.Builder.Luis.Models.DialogResponse.DialogStatus">
+            <summary>
+            Possible values for <see cref="P:Microsoft.Bot.Builder.Luis.Models.DialogResponse.Status"/>
+            </summary>
+        </member>
+        <member name="F:Microsoft.Bot.Builder.Luis.Models.DialogResponse.DialogStatus.Question">
+            <summary>
+            Send the prompt in <see cref="P:Microsoft.Bot.Builder.Luis.Models.DialogResponse.Prompt"/>
+            </summary>
+        </member>
+        <member name="F:Microsoft.Bot.Builder.Luis.Models.DialogResponse.DialogStatus.Finished">
+            <summary>
+            Dialog is finished.
+            </summary>
         </member>
         <member name="T:Microsoft.Bot.Builder.Luis.Models.EntityRecommendation">
             <summary>
@@ -3678,6 +4994,11 @@
             A machine readable dictionary with more information about the
             entity Look at builtin.datetime for an example in the
             https://www.luis.ai/Help#PreBuiltEntities.
+            </summary>
+        </member>
+        <member name="M:Microsoft.Bot.Builder.Luis.Models.EntityRecommendation.Validate">
+            <summary>
+            Validate the object. Throws ValidationException if validation fails.
             </summary>
         </member>
         <member name="T:Microsoft.Bot.Builder.Luis.Models.IntentRecommendation">
@@ -3741,7 +5062,7 @@
             Initializes a new instance of the ActionParameter class.
             </summary>
         </member>
-        <member name="M:Microsoft.Bot.Builder.Luis.Models.ActionParameter.#ctor(System.String,System.Nullable{System.Boolean},System.Collections.Generic.IList{Microsoft.Bot.Builder.Luis.Models.ActionParameterValue})">
+        <member name="M:Microsoft.Bot.Builder.Luis.Models.ActionParameter.#ctor(System.String,System.Nullable{System.Boolean},System.Collections.Generic.IList{Microsoft.Bot.Builder.Luis.Models.EntityRecommendation})">
             <summary>
             Initializes a new instance of the ActionParameter class.
             </summary>
@@ -3761,37 +5082,12 @@
             Value of extracted entities for this parameter.
             </summary>
         </member>
-        <member name="M:Microsoft.Bot.Builder.Luis.Models.ActionParameterValue.#ctor">
-            <summary>
-            Initializes a new instance of the ActionParameterValue class.
-            </summary>
-        </member>
-        <member name="M:Microsoft.Bot.Builder.Luis.Models.ActionParameterValue.#ctor(System.String,System.String,System.Nullable{System.Double})">
-            <summary>
-            Initializes a new instance of the ActionParameterValue class.
-            </summary>
-        </member>
-        <member name="P:Microsoft.Bot.Builder.Luis.Models.ActionParameterValue.Entity">
-            <summary>
-            Entity extracted by LUIS.
-            </summary>
-        </member>
-        <member name="P:Microsoft.Bot.Builder.Luis.Models.ActionParameterValue.Type">
-            <summary>
-            Type of the entity.
-            </summary>
-        </member>
-        <member name="P:Microsoft.Bot.Builder.Luis.Models.ActionParameterValue.Score">
-            <summary>
-            Score assigned by LUIS to detected entity.
-            </summary>
-        </member>
         <member name="M:Microsoft.Bot.Builder.Luis.Models.LuisResult.#ctor">
             <summary>
             Initializes a new instance of the LuisResult class.
             </summary>
         </member>
-        <member name="M:Microsoft.Bot.Builder.Luis.Models.LuisResult.#ctor(System.String,System.Collections.Generic.IList{Microsoft.Bot.Builder.Luis.Models.IntentRecommendation},System.Collections.Generic.IList{Microsoft.Bot.Builder.Luis.Models.EntityRecommendation})">
+        <member name="M:Microsoft.Bot.Builder.Luis.Models.LuisResult.#ctor(System.String,System.Collections.Generic.IList{Microsoft.Bot.Builder.Luis.Models.EntityRecommendation},Microsoft.Bot.Builder.Luis.Models.IntentRecommendation,System.Collections.Generic.IList{Microsoft.Bot.Builder.Luis.Models.IntentRecommendation},System.Collections.Generic.IList{Microsoft.Bot.Builder.Luis.Models.CompositeEntity},Microsoft.Bot.Builder.Luis.Models.DialogResponse,System.String)">
             <summary>
             Initializes a new instance of the LuisResult class.
             </summary>
@@ -3799,6 +5095,10 @@
         <member name="P:Microsoft.Bot.Builder.Luis.Models.LuisResult.Query">
             <summary>
             The query sent to LUIS.
+            </summary>
+        </member>
+        <member name="P:Microsoft.Bot.Builder.Luis.Models.LuisResult.TopScoringIntent">
+            <summary>
             </summary>
         </member>
         <member name="P:Microsoft.Bot.Builder.Luis.Models.LuisResult.Intents">
@@ -3811,10 +5111,110 @@
             The entities found in the query text.
             </summary>
         </member>
+        <member name="P:Microsoft.Bot.Builder.Luis.Models.LuisResult.CompositeEntities">
+            <summary>
+            The composite entities found in the utterance.
+            </summary>
+        </member>
+        <member name="P:Microsoft.Bot.Builder.Luis.Models.LuisResult.Dialog">
+            <summary>
+            </summary>
+        </member>
+        <member name="P:Microsoft.Bot.Builder.Luis.Models.LuisResult.AlteredQuery">
+            <summary>
+            The altered query used by LUIS to extract intent and entities. For
+            example, when Bing spell check is enabled for a model, this field
+            will contain the spell checked utterance.
+            </summary>
+        </member>
         <member name="M:Microsoft.Bot.Builder.Luis.Models.LuisResult.Validate">
             <summary>
             Validate the object. Throws ValidationException if validation fails.
             </summary>
+        </member>
+        <member name="T:Microsoft.Bot.Builder.Luis.LuisRequest">
+            <summary>
+            Object that contains all the possible parameters to build Luis request.
+            </summary>
+        </member>
+        <member name="F:Microsoft.Bot.Builder.Luis.LuisRequest.Query">
+            <summary>
+            The text query.
+            </summary>
+        </member>
+        <member name="F:Microsoft.Bot.Builder.Luis.LuisRequest.TimezoneOffset">
+            <summary>
+            The time zone offset.
+            </summary>
+        </member>
+        <member name="F:Microsoft.Bot.Builder.Luis.LuisRequest.ContextId">
+            <summary>
+            The context id.
+            </summary>
+        </member>
+        <member name="F:Microsoft.Bot.Builder.Luis.LuisRequest.Verbose">
+            <summary>
+            The verbose flag.
+            </summary>
+        </member>
+        <member name="F:Microsoft.Bot.Builder.Luis.LuisRequest.ForceSet">
+            <summary>
+            Force setting the parameter.
+            </summary>
+        </member>
+        <member name="F:Microsoft.Bot.Builder.Luis.LuisRequest.AllowSampling">
+            <summary>
+            Indicates if sampling is allowed.
+            </summary>
+        </member>
+        <member name="M:Microsoft.Bot.Builder.Luis.LuisRequest.#ctor(System.String,System.Nullable{System.Double},System.String,System.Nullable{System.Boolean},System.String,System.String)">
+            <summary>
+            Constructs an instance of the LuisReqeuest.
+            </summary>
+            <param name="query"> The text query.</param>
+            <param name="timezoneOffset"> The time zone offset.</param>
+            <param name="contextId"> The context id for Luis dialog.</param>
+            <param name="verbose"> Indicates if the <see cref="T:Microsoft.Bot.Builder.Luis.Models.LuisResult"/> should be verbose.</param>
+            <param name="forceSet"> Force setting the parameter.</param>
+            <param name="allowSampling"> Allow sampling.</param>
+        </member>
+        <member name="M:Microsoft.Bot.Builder.Luis.LuisRequest.BuildUri(Microsoft.Bot.Builder.Luis.ILuisModel)">
+            <summary>
+            Build the Uri for issuing the request for the specified Luis model.
+            </summary>
+            <param name="model"> The Luis model.</param>
+            <returns> The request Uri.</returns>
+        </member>
+        <member name="T:Microsoft.Bot.Builder.Luis.ILuisService">
+            <summary>
+            A mockable interface for the LUIS service.
+            </summary>
+        </member>
+        <member name="M:Microsoft.Bot.Builder.Luis.ILuisService.BuildUri(Microsoft.Bot.Builder.Luis.LuisRequest)">
+            <summary>
+            Build the query uri for the <see cref="T:Microsoft.Bot.Builder.Luis.LuisRequest"/>.
+            </summary>
+            <param name="luisRequest">The luis request text.</param>
+            <returns>The query uri.</returns>
+        </member>
+        <member name="M:Microsoft.Bot.Builder.Luis.ILuisService.QueryAsync(System.Uri,System.Threading.CancellationToken)">
+            <summary>
+            Query the LUIS service using this uri.
+            </summary>
+            <param name="uri">The query uri.</param>
+            <param name="token">The cancellation token.</param>
+            <returns>The LUIS result.</returns>
+        </member>
+        <member name="T:Microsoft.Bot.Builder.Luis.LuisService">
+            <summary>
+            Standard implementation of ILuisService against actual LUIS service.
+            </summary>
+        </member>
+        <member name="M:Microsoft.Bot.Builder.Luis.LuisService.#ctor(Microsoft.Bot.Builder.Luis.ILuisModel)">
+            <summary>
+            Construct the LUIS service using the model information.
+            </summary>
+            <param name="model">The LUIS model information.</param>
         </member>
         <member name="T:Microsoft.Bot.Builder.Resource.Extensions">
             <summary>   Extensions for resources. </summary>
@@ -3933,6 +5333,11 @@
         <member name="P:Microsoft.Bot.Builder.Resource.Resources.CommandStatusTerms">
             <summary>
               Looks up a localized string similar to status;progress;so far;results.
+            </summary>
+        </member>
+        <member name="P:Microsoft.Bot.Builder.Resource.Resources.Confirmation">
+            <summary>
+              Looks up a localized string similar to Confirmation.
             </summary>
         </member>
         <member name="P:Microsoft.Bot.Builder.Resource.Resources.ConfirmChoiceFormat">
@@ -4192,6 +5597,11 @@
         <member name="P:Microsoft.Bot.Builder.Resource.Resources.TooManyAttempts">
             <summary>
               Looks up a localized string similar to too many attempts.
+            </summary>
+        </member>
+        <member name="P:Microsoft.Bot.Builder.Resource.Resources.UnhandledExceptionToUser">
+            <summary>
+              Looks up a localized string similar to Sorry, my bot code is having an issue..
             </summary>
         </member>
         <member name="P:Microsoft.Bot.Builder.Resource.Resources.UserProfileDeleted">
