@@ -24,9 +24,9 @@ namespace DinnerBot
                 //If we're passed an attachment, handle it
                 if (activity.Attachments != null && activity.Attachments.Any())
                 {
-                    string faceKey = "yourkey";
-                    string emotionKey = "yourkey";
-                    string visionKey = "yourkey";
+                    string faceKey = "d3d773ae89354e73a6753de49a0bad40";
+                    string emotionKey = "260814a2dd9f4ccc8852ce3d9e4daa13";
+                    string visionKey = "feb92159516e483e803264995e36de01";
 
                     await
                         Conversation.SendAsync(activity,

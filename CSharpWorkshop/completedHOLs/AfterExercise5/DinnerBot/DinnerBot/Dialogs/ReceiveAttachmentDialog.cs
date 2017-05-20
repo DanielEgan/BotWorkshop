@@ -57,6 +57,16 @@ internal class ReceiveAttachmentDialog : IDialog<object>
                 var contentLengthBytes = responseMessage.Content.Headers.ContentLength;
                 var stream = await responseMessage.Content.ReadAsStreamAsync();
 
+                var reply = context.MakeMessage();
+
+                reply.Attachments.Add(new Attachment()
+                {
+                    ContentUrl = attachment.ContentUrl,
+                    ContentType = "image/png",
+                    Name = "5test.png"
+                });
+
+                await context.PostAsync(reply);
                 //var faces = await DetectEmotions(GetImageAsMemoryStream(stream));
                 //foreach (var face in faces)
                 //{
@@ -65,7 +75,7 @@ internal class ReceiveAttachmentDialog : IDialog<object>
 
                 var visionResults = await DetectObjects(GetImageAsMemoryStream(stream));
 
-                context.PostAsync($"This image seems like: {string.Join(",", visionResults.Description.Tags)}");
+                await context.PostAsync($"This image seems like: {string.Join(",", visionResults.Description.Tags)}");
 
 
                 await context.PostAsync($"Attachment of {attachment.ContentType} type and size of {contentLengthBytes} bytes received.");
