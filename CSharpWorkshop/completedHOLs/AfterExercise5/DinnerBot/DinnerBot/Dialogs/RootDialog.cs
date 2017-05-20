@@ -57,14 +57,14 @@ namespace DinnerBot.Dialogs
         {
             context.Call(new HelloDialog(), this.ResumeAfterOptionDialog);
         }
+
         [LuisIntent("Help")]
         public async Task Help(IDialogContext context, LuisResult result)
         {
             await context.PostAsync("Insert Help Dialog here");
             context.Wait(MessageReceived);
         }
-
-
+        
         private async Task ReservationFormComplete(IDialogContext context, IAwaitable<Reservation> result)
         {
             try

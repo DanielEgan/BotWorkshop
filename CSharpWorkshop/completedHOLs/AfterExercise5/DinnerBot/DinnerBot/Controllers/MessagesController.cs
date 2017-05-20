@@ -1,4 +1,5 @@
-﻿using System.Net;
+﻿using System.Linq;
+using System.Net;
 using System.Net.Http;
 using System.Threading.Tasks;
 using System.Web.Http;
@@ -18,7 +19,24 @@ namespace DinnerBot
         {
             if (activity.Type == ActivityTypes.Message)
             {
-                await Conversation.SendAsync(activity, () => new Dialogs.RootDialog());
+
+                //Cognitive Service specific
+                //If we're passed an attachment, handle it
+                if (activity.Attachments != null && activity.Attachments.Any())
+                {
+                    string faceKey = "yourkey";
+                    string emotionKey = "yourkey";
+                    string visionKey = "yourkey";
+
+                    await
+                        Conversation.SendAsync(activity,
+                            () => new ReceiveAttachmentDialog(faceKey, emotionKey, visionKey));
+                }
+                else
+                {
+                    //otherwise start conversation
+                    await Conversation.SendAsync(activity, () => new Dialogs.RootDialog());
+                }
             }
             else
             {
